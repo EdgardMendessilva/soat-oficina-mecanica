@@ -18,10 +18,10 @@ A oficina controla atendimento, diagnóstico, orçamento, execução e entrega c
 | Cadastro de veículo: placa (validada), fabricante, modelo, ano, cor | Enunciado + decisão do autor |
 | Cadastro de funcionário: CPF (validado), nome, cargo, perfil de acesso | Decisão do autor |
 | Login de funcionário (CPF + senha) com JWT e perfis de acesso; cadastro feito pelo gerente | Enunciado (JWT) + decisão do autor (perfis) |
-| Administrador (RH ou dono) cadastra colaboradores; o primeiro é criado na primeira inicialização | Decisão do autor |
+| Administrador (RH ou dono) cadastra funcionários; o primeiro é criado na primeira inicialização | Decisão do autor |
 | Login de cliente (CPF + senha), com primeiro acesso por código entregue no balcão; vê e decide apenas sobre as OS dos próprios veículos | Decisão do autor |
 | Ordem de serviço com serviços, peças, orçamento automático e status | Enunciado |
-| Aprovação ou rejeição do orçamento pelo cliente via API | Enunciado |
+| Aprovação ou reprovação do orçamento pelo cliente via API | Enunciado |
 | Desconto de até 10% com orçamento fechado, autorizado com a senha do gerente | Decisão do autor |
 | Isenção do valor do orçamento pelo gerente | Decisão do autor |
 | CRUD de serviços, peças e insumos com controle de estoque | Enunciado |
@@ -41,7 +41,7 @@ A oficina controla atendimento, diagnóstico, orçamento, execução e entrega c
 | **Atendente** | Cadastrar clientes e veículos, abrir OS, enviar orçamento |
 | **Mecânico** | Registrar diagnóstico, incluir serviços e peças, iniciar e finalizar execução |
 | **Gerente** | Tudo do atendente e do mecânico, aplicar desconto, isentar orçamento, cadastrar funcionários e definir perfis, gerenciar estoque e catálogo |
-| **Administrador** | RH ou dono da oficina; cadastra colaboradores; acesso a todos os papéis de funcionário |
+| **Administrador** | RH ou dono da oficina; cadastra funcionários; acesso a todos os papéis de funcionário |
 
 > A divisão de permissões entre atendente e mecânico é uma proposta inicial e pode ser ajustada no Event Storming.
 
@@ -64,12 +64,12 @@ O total do orçamento é a soma dos serviços mais as peças multiplicadas pela 
 | Decisão | Cliente paga |
 |---|---|
 | **Aprovado** (orçamento fechado) | Serviços + peças. **Não paga o valor do orçamento.** |
-| **Rejeitado** | **Apenas o valor do orçamento** |
+| **Reprovado** | **Apenas o valor do orçamento** |
 
-Na rejeição, a OS vai para Finalizada sem execução e depois para Entregue, quando o veículo é devolvido. Nenhuma peça é baixada do estoque.
+Na reprovação, a OS vai para Finalizada sem execução e depois para Entregue, quando o veículo é devolvido. Nenhuma peça é baixada do estoque.
 
 ### RN06 — Quem decide o orçamento
-Somente o cliente dono do veículo, autenticado, pode aprovar ou rejeitar o orçamento da OS. O sistema registra quem decidiu e quando.
+Somente o cliente dono do veículo, autenticado, pode aprovar ou reprovar o orçamento da OS. O sistema registra quem decidiu e quando.
 
 ### RN07 — Desconto
 **Quando:** somente com o orçamento fechado (aprovado pelo cliente).
@@ -125,7 +125,7 @@ O cliente não se cadastra sozinho. Sem o código entregue no balcão, não é p
 Somente o gerente (ou o Administrador) cadastra funcionários e altera perfis.
 
 ### RN14 — Administrador
-- O Administrador é quem cadastra os colaboradores: o RH ou o dono da oficina.
+- O Administrador é quem cadastra os funcionários: o RH ou o dono da oficina.
 - Na primeira inicialização do sistema, o primeiro Administrador é criado automaticamente.
 - Tem acesso a todos os papéis de funcionário.
 - A credencial inicial é definida na instalação, nunca fixa no código.
@@ -137,7 +137,7 @@ O cliente tem acesso fechado: acompanha o fluxo da OS, aprova ou reprova o orça
 
 | # | Pergunta | Impacta |
 |---|---|---|
-| P3 | A isenção acontece só na rejeição ("não conseguimos resolver") ou também em outros momentos? | RN05, RN08 |
+| P3 | A isenção acontece só na reprovação ("não conseguimos resolver") ou também em outros momentos? | RN05, RN08 |
 
 ### Pendências resolvidas
 
@@ -145,6 +145,6 @@ O cliente tem acesso fechado: acompanha o fluxo da OS, aprova ou reprova o orça
 |---|---|---|
 | P4 | Funcionário cadastra o cliente no balcão; cliente ativa a conta no app com CPF + código de primeiro acesso e define a senha | RN11 |
 | P5 | Funcionário segue o mesmo fluxo: gerente cadastra, funcionário ativa com CPF + código e define a senha; login com CPF + senha | RN13 |
-| P6 | Administrador é o RH ou o dono da oficina, cadastra colaboradores; cliente tem acesso fechado (acompanha, aprova, reprova) | RN14, RN15 |
+| P6 | Administrador é o RH ou o dono da oficina, cadastra funcionários; cliente tem acesso fechado (acompanha, aprova, reprova) | RN14, RN15 |
 | P1 | Desconto incide sobre serviços + peças ou apenas sobre a mão de obra | RN07 |
 | P2 | Teto de 10%; aplicado só com orçamento fechado e autorizado com a senha do gerente | RN07 |
