@@ -26,7 +26,7 @@ Contextos do domínio (bounded contexts):
 | **Cadastro** | Clientes e veículos |
 | **Catálogo** | Serviços oferecidos e preços |
 | **Estoque** | Peças e insumos, saldo, reserva e baixa |
-| **Identidade e Acesso** | Funcionários, perfis, login de funcionário e de cliente |
+| **Identidade e Acesso** | Funcionários, os 5 perfis (Cliente, Atendente, Mecânico, Gerente, Administrador), login de funcionário e de cliente |
 
 Regra de dependência: Interfaces → Aplicação → Domínio, e Infraestrutura → Domínio. O domínio não depende de nenhuma outra camada.
 
