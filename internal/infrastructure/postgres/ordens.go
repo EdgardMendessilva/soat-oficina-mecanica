@@ -123,7 +123,7 @@ func (r *Ordens) carregar(ctx context.Context, travar bool, filtro string, args 
 	if err != nil {
 		return nil, err
 	}
-	defer linhas.Close()
+	defer func() { _ = linhas.Close() }()
 
 	var ordem []string
 	dados := map[string]*ordemservico.Dados{}
@@ -164,7 +164,7 @@ func (r *Ordens) carregar(ctx context.Context, travar bool, filtro string, args 
 	if err := linhas.Err(); err != nil {
 		return nil, err
 	}
-	linhas.Close()
+	_ = linhas.Close()
 	if len(ordem) == 0 {
 		return nil, nil
 	}
@@ -237,7 +237,7 @@ func (r *Ordens) lerFilhos(ctx context.Context, consulta string, args []any, lin
 	if err != nil {
 		return err
 	}
-	defer rs.Close()
+	defer func() { _ = rs.Close() }()
 	for rs.Next() {
 		if err := linha(rs); err != nil {
 			return err

@@ -21,11 +21,11 @@ func Abrir(ctx context.Context, url string) (*sql.DB, error) {
 		return nil, err
 	}
 	if err := db.PingContext(ctx); err != nil {
-		db.Close()
+		_ = db.Close()
 		return nil, fmt.Errorf("conectar ao banco: %w", err)
 	}
 	if err := Migrar(ctx, db); err != nil {
-		db.Close()
+		_ = db.Close()
 		return nil, err
 	}
 	return db, nil
@@ -40,7 +40,7 @@ func Migrar(ctx context.Context, db *sql.DB) error {
 	if err != nil {
 		return err
 	}
-	defer conn.Close()
+	defer func() { _ = conn.Close() }()
 
 	if _, err := conn.ExecContext(ctx, `SELECT pg_advisory_lock($1)`, idTravaMigracao); err != nil {
 		return err
