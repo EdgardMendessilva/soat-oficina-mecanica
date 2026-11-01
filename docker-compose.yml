@@ -26,6 +26,9 @@ services:
       PORT: "8080"
       DATABASE_URL: postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}?sslmode=disable
       JWT_SECRET: ${JWT_SECRET:?defina no .env}
+      SEED_DEMO: ${SEED_DEMO:-true}
+      ADMIN_DOCUMENTO: ${ADMIN_DOCUMENTO:-}
+      ADMIN_SENHA: ${ADMIN_SENHA:-}
     ports:
       - "8080:8080"
 

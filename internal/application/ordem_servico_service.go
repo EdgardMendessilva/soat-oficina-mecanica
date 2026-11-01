@@ -252,3 +252,28 @@ func (s *OrdemDeServicoService) TempoMedioDeExecucao(ctx context.Context) (time.
 	}
 	return soma / time.Duration(n), n, nil
 }
+
+// Consultar devolve qualquer OS; é para funcionários. O cliente usa ConsultarDoCliente.
+func (s *OrdemDeServicoService) Consultar(ctx context.Context, id string) (*ordemservico.OrdemDeServico, error) {
+	return s.carregar(ctx, id)
+}
+
+// Listar devolve todas as OS, para funcionários.
+func (s *OrdemDeServicoService) Listar(ctx context.Context) ([]*ordemservico.OrdemDeServico, error) {
+	return s.ordens.ListarTodas(ctx)
+}
+
+// ListarDoCliente devolve só as OS do cliente (RN10).
+func (s *OrdemDeServicoService) ListarDoCliente(ctx context.Context, clienteID string) ([]*ordemservico.OrdemDeServico, error) {
+	todas, err := s.ordens.ListarTodas(ctx)
+	if err != nil {
+		return nil, err
+	}
+	var minhas []*ordemservico.OrdemDeServico
+	for _, o := range todas {
+		if o.ClienteID() == clienteID {
+			minhas = append(minhas, o)
+		}
+	}
+	return minhas, nil
+}

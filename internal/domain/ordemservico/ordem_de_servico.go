@@ -66,10 +66,14 @@ func Nova(id, clienteID, veiculoID string, valorDoOrcamento valueobject.Dinheiro
 }
 
 // Getters.
-func (o *OrdemDeServico) ID() string            { return o.id }
-func (o *OrdemDeServico) ClienteID() string     { return o.clienteID }
-func (o *OrdemDeServico) VeiculoID() string     { return o.veiculoID }
-func (o *OrdemDeServico) Status() Status        { return o.status }
+func (o *OrdemDeServico) ID() string        { return o.id }
+func (o *OrdemDeServico) ClienteID() string { return o.clienteID }
+func (o *OrdemDeServico) VeiculoID() string { return o.veiculoID }
+func (o *OrdemDeServico) Status() Status    { return o.status }
+
+// ValorDoOrcamento é o que o cliente paga se reprovar o orçamento (RN05).
+func (o *OrdemDeServico) ValorDoOrcamento() valueobject.Dinheiro { return o.valorDoOrcamento }
+
 func (o *OrdemDeServico) Decisao() Decisao      { return o.decisao }
 func (o *OrdemDeServico) DecididoPor() string   { return o.decididoPor }
 func (o *OrdemDeServico) DecididoEm() time.Time { return o.decididoEm }
