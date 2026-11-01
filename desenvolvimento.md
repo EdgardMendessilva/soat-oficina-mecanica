@@ -74,20 +74,14 @@ Pronto e na `main`:
 - Dockerfile e docker-compose (API + Postgres 16).
 - Persistência PostgreSQL (`internal/infrastructure/postgres`): repositórios de OS, estoque e usuários, transação real com `FOR UPDATE`, migrations embutidas aplicadas na inicialização e seed idempotente. Com `DATABASE_URL` a API usa o Postgres; sem ela, continua em memória (`internal/infrastructure/memoria`).
 
-Ainda não existe: rotas de cadastro de clientes e veículos, primeiro acesso por e-mail, documentação DDD, README completo, relatório de vulnerabilidades.
+- Cadastro de clientes (CPF ou CNPJ) e veículos (placa, fabricante, modelo, ano, cor), catálogo de serviços (CRUD) e conferência de veículo do cliente ao abrir a OS. Repositórios em memória e em PostgreSQL (migration 002).
+- Documentação DDD em `docs/ddd/` (Event Storming, diagramas, linguagem ubíqua, relação com o código) e coleção do Postman em `docs/postman/`.
 
-## 6. Tarefa em andamento: persistência PostgreSQL (TT-37, TT-38, TT-40)
+Ainda não existe: primeiro acesso por e-mail e cadastro de funcionários pela API (modelados, fora do MVP entregue), README completo, relatório de vulnerabilidades.
 
-Objetivo: a API usar o Postgres do compose no lugar da memória.
+## 6. Próximas tarefas
 
-1. Adicionar o driver (`github.com/jackc/pgx/v5` com `stdlib`, ou `github.com/lib/pq`) e rodar `go mod tidy`.
-2. Criar `internal/infrastructure/postgres` com repositórios que implementem `OrdemRepositorio`, `EstoqueRepositorio`, `UsuarioRepositorio` e `AutorizadorGerente`, e uma `Transacao` real: `BEGIN`/`COMMIT`, o contexto carregando o `*sql.Tx`, e `SELECT ... FOR UPDATE` no saldo do estoque (RN09).
-3. Migrations SQL embutidas (`go:embed`) aplicadas na inicialização: usuários, ordens, serviços e peças da OS, histórico de status, estoque. Valores em `BIGINT` (centavos).
-4. Em `cmd/api/main.go`: se `DATABASE_URL` existir, usar Postgres; senão, manter a memória. Fazer o seed dos usuários demo também no Postgres, de forma idempotente (`memoria.Semear` tem a lógica de referência).
-5. Testes de integração com banco real, usando o Postgres do compose via variável de ambiente de teste; pular o teste se a variável não existir. Cobrir: fluxo completo da OS e "aprovação sem estoque suficiente não altera nada".
-6. Rodar `go test ./...`, `go vet ./...` e `docker compose up --build`, e validar pelo Swagger o fluxo: login → abrir OS → diagnóstico → serviço e peça → orçamento → aprovação do cliente → finalização → entrega.
-
-Não mexer em `internal/interfaces/http` (outra frente trabalha lá). Se precisar de uma porta nova, ajustar `portas.go` e avisar.
+README completo, relatório de vulnerabilidades (gosec e govulncheck), tag `v1.0.0` e registro do commit final. A tarefa de persistência PostgreSQL foi concluída (seção 7).
 
 ## 7. Registro do que foi feito
 

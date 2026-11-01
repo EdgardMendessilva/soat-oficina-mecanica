@@ -33,6 +33,9 @@ func main() {
 	var (
 		ordens   application.OrdemRepositorio
 		itens    application.EstoqueRepositorio
+		clientes application.ClienteRepositorio
+		veiculos application.VeiculoRepositorio
+		servicos application.ServicoRepositorio
 		tx       application.Transacao
 		usuarios interface {
 			application.UsuarioRepositorio
@@ -52,6 +55,7 @@ func main() {
 			log.Fatal(err)
 		}
 		ordens, itens, tx, usuarios = postgres.NovasOrdens(db), postgres.NovoEstoque(db), postgres.NovaTransacao(db), u
+		clientes, veiculos, servicos = postgres.NovosClientes(db), postgres.NovosVeiculos(db), postgres.NovosServicos(db)
 		log.Print("persistência: PostgreSQL")
 	} else {
 		u := memoria.NovosUsuarios()
@@ -59,13 +63,23 @@ func main() {
 			log.Fatal(err)
 		}
 		ordens, itens, tx, usuarios = memoria.NovasOrdens(), memoria.NovoEstoque(), &memoria.Transacao{}, u
+		clientes, veiculos, servicos = memoria.NovosClientes(), memoria.NovosVeiculos(), memoria.NovosServicos()
 		log.Print("persistência: memória (defina DATABASE_URL para usar o PostgreSQL)")
 	}
 
+	if demo {
+		if err := memoria.SemearCadastro(context.Background(), clientes, veiculos); err != nil {
+			log.Fatal(err)
+		}
+	}
+
+	cadastroSvc := application.NovoCadastroService(clientes, veiculos, tx)
 	srv := apihttp.NovoServidor(
-		application.NovoOrdemDeServicoService(ordens, itens, tx, usuarios, relogio{}),
+		application.NovoOrdemDeServicoService(ordens, itens, tx, usuarios, relogio{}).ComCadastro(cadastroSvc),
 		application.NovoEstoqueService(itens, tx),
 		application.NovoAutenticacaoService(usuarios, seguranca.Verificador{}),
+		cadastroSvc,
+		application.NovoCatalogoService(servicos, tx),
 		jwt,
 	)
 

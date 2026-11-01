@@ -7,6 +7,8 @@ import (
 	"net/http"
 
 	"github.com/EdgardMendessilva/soat-oficina-mecanica/internal/application"
+	"github.com/EdgardMendessilva/soat-oficina-mecanica/internal/domain/cadastro"
+	"github.com/EdgardMendessilva/soat-oficina-mecanica/internal/domain/catalogo"
 	"github.com/EdgardMendessilva/soat-oficina-mecanica/internal/domain/estoque"
 	"github.com/EdgardMendessilva/soat-oficina-mecanica/internal/domain/identidade"
 	"github.com/EdgardMendessilva/soat-oficina-mecanica/internal/domain/ordemservico"
@@ -37,17 +39,21 @@ func escreverErro(w http.ResponseWriter, status int, codigo, mensagem string) {
 
 // classes de erro do domínio → status HTTP. Erro desconhecido vira 500 sem vazar detalhe.
 var (
-	naoEncontrados = []error{application.ErrOrdemNaoEncontrada, application.ErrPecaNaoEncontrada, application.ErrItemNaoEncontrado}
-	proibidos      = []error{application.ErrAcessoNegado, ordemservico.ErrSomenteDonoDecide, application.ErrSenhaDoGerenteInvalida}
-	conflitos      = []error{
+	naoEncontrados = []error{application.ErrOrdemNaoEncontrada, application.ErrPecaNaoEncontrada, application.ErrItemNaoEncontrado,
+		application.ErrClienteNaoEncontrado, application.ErrVeiculoNaoEncontrado, application.ErrServicoNaoEncontrado}
+	proibidos = []error{application.ErrAcessoNegado, ordemservico.ErrSomenteDonoDecide, application.ErrSenhaDoGerenteInvalida}
+	conflitos = []error{
 		ordemservico.ErrTransicaoInvalida, ordemservico.ErrItensSoNoDiagnostico, ordemservico.ErrOrcamentoVazio,
 		ordemservico.ErrDecisaoNaoRegistrada, ordemservico.ErrDescontoSemOrcamentoFechado, ordemservico.ErrDescontoJaAplicado,
 		application.ErrEstoqueInsuficiente, estoque.ErrSaldoInsuficiente, application.ErrItemJaExiste,
+		application.ErrClienteJaExiste, application.ErrPlacaJaCadastrada, application.ErrServicoJaExiste,
 	}
 	invalidos = []error{
 		ordemservico.ErrDescricaoVazia, ordemservico.ErrQuantidadeInvalida, ordemservico.ErrIDObrigatorio,
 		ordemservico.ErrDescontoAcimaDoTeto, ordemservico.ErrBaseDeDescontoInvalida, ordemservico.ErrDescontoSemAutorizacao,
 		estoque.ErrItemInvalido, estoque.ErrQuantidadeZero, identidade.ErrSenhaFraca,
+		cadastro.ErrNomeObrigatorio, cadastro.ErrEmailInvalido, cadastro.ErrAnoInvalido, cadastro.ErrDadosDoVeiculo,
+		catalogo.ErrServicoInvalido, application.ErrVeiculoDeOutroCliente,
 		valueobject.ErrValorNegativo, valueobject.ErrQuantidadeNegativa, valueobject.ErrPercentualInvalido,
 		valueobject.ErrDocumentoInvalido, valueobject.ErrPlacaInvalida,
 	}

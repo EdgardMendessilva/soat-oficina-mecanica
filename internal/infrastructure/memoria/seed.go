@@ -1,6 +1,10 @@
 package memoria
 
 import (
+	"context"
+
+	"github.com/EdgardMendessilva/soat-oficina-mecanica/internal/application"
+	"github.com/EdgardMendessilva/soat-oficina-mecanica/internal/domain/cadastro"
 	"github.com/EdgardMendessilva/soat-oficina-mecanica/internal/domain/identidade"
 	"github.com/EdgardMendessilva/soat-oficina-mecanica/internal/infrastructure/seguranca"
 )
@@ -58,4 +62,33 @@ func UsuariosIniciais(adminDocumento, adminSenha string, demo bool) ([]identidad
 		}
 	}
 	return out, nil
+}
+
+// SemearCadastro grava os clientes e veículos de demonstração que correspondem aos usuários Cliente.
+// Funciona com qualquer repositório cujo Salvar atualize quando o ID já existe.
+func SemearCadastro(ctx context.Context, clientes application.ClienteRepositorio, veiculos application.VeiculoRepositorio) error {
+	demos := []struct {
+		clienteID, doc, nome, veiculoID, placa, modelo string
+		ano                                            int
+	}{
+		{"cli-demo", "93541134780", "Cliente Demo", "veic-demo", "ABC1D23", "Kwid", 2023},
+		{"cli-outro", "86288366757", "Outro Cliente Demo", "veic-outro", "XYZ9K87", "Onix", 2021},
+	}
+	for _, d := range demos {
+		c, err := cadastro.NovoCliente(d.clienteID, d.doc, d.nome, d.clienteID+"@oficina.local", "", "")
+		if err != nil {
+			return err
+		}
+		if err := clientes.Salvar(ctx, c); err != nil {
+			return err
+		}
+		v, err := cadastro.NovoVeiculo(d.veiculoID, d.clienteID, d.placa, "Fabricante Demo", d.modelo, d.ano, "Prata")
+		if err != nil {
+			return err
+		}
+		if err := veiculos.Salvar(ctx, v); err != nil {
+			return err
+		}
+	}
+	return nil
 }

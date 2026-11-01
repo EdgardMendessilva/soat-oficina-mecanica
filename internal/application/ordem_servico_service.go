@@ -23,16 +23,23 @@ var (
 // OrdemDeServicoService reúne os casos de uso do fluxo da OS. Orquestra o domínio,
 // os repositórios e a transação, sem conter regra de negócio própria.
 type OrdemDeServicoService struct {
-	ordens  OrdemRepositorio
-	itens   EstoqueRepositorio
-	tx      Transacao
-	auth    AutorizadorGerente
-	relogio Relogio
+	ordens   OrdemRepositorio
+	itens    EstoqueRepositorio
+	tx       Transacao
+	auth     AutorizadorGerente
+	relogio  Relogio
+	veiculos VerificadorDeVeiculo
 }
 
 // NovoOrdemDeServicoService monta o serviço com suas dependências.
 func NovoOrdemDeServicoService(ordens OrdemRepositorio, itens EstoqueRepositorio, tx Transacao, auth AutorizadorGerente, relogio Relogio) *OrdemDeServicoService {
 	return &OrdemDeServicoService{ordens: ordens, itens: itens, tx: tx, auth: auth, relogio: relogio}
+}
+
+// ComCadastro faz a abertura da OS conferir se o cliente e o veículo existem e se o veículo é do cliente.
+func (s *OrdemDeServicoService) ComCadastro(v VerificadorDeVeiculo) *OrdemDeServicoService {
+	s.veiculos = v
+	return s
 }
 
 func (s *OrdemDeServicoService) carregar(ctx context.Context, id string) (*ordemservico.OrdemDeServico, error) {
@@ -65,6 +72,11 @@ func (s *OrdemDeServicoService) Abrir(ctx context.Context, id, clienteID, veicul
 	valor, err := valueobject.NovoDinheiro(valorDoOrcamentoCentavos)
 	if err != nil {
 		return err
+	}
+	if s.veiculos != nil {
+		if err := s.veiculos.VeiculoDoCliente(ctx, clienteID, veiculoID); err != nil {
+			return err
+		}
 	}
 	o, err := ordemservico.Nova(id, clienteID, veiculoID, valor, s.relogio.Agora())
 	if err != nil {

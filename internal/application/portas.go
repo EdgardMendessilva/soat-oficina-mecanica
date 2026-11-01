@@ -5,6 +5,8 @@ import (
 	"errors"
 	"time"
 
+	"github.com/EdgardMendessilva/soat-oficina-mecanica/internal/domain/cadastro"
+	"github.com/EdgardMendessilva/soat-oficina-mecanica/internal/domain/catalogo"
 	"github.com/EdgardMendessilva/soat-oficina-mecanica/internal/domain/estoque"
 	"github.com/EdgardMendessilva/soat-oficina-mecanica/internal/domain/identidade"
 	"github.com/EdgardMendessilva/soat-oficina-mecanica/internal/domain/ordemservico"
@@ -50,4 +52,33 @@ type UsuarioRepositorio interface {
 // VerificadorSenha compara a senha digitada com o hash guardado.
 type VerificadorSenha interface {
 	Conferir(senha, hash string) bool
+}
+
+// ClienteRepositorio é a porta de persistência dos clientes.
+type ClienteRepositorio interface {
+	BuscarPorID(ctx context.Context, id string) (*cadastro.Cliente, error)
+	BuscarPorDocumento(ctx context.Context, documento string) (*cadastro.Cliente, error)
+	Salvar(ctx context.Context, c *cadastro.Cliente) error
+	ListarTodos(ctx context.Context) ([]*cadastro.Cliente, error)
+}
+
+// VeiculoRepositorio é a porta de persistência dos veículos.
+type VeiculoRepositorio interface {
+	BuscarPorID(ctx context.Context, id string) (*cadastro.Veiculo, error)
+	BuscarPorPlaca(ctx context.Context, placa string) (*cadastro.Veiculo, error)
+	Salvar(ctx context.Context, v *cadastro.Veiculo) error
+	ListarDoCliente(ctx context.Context, clienteID string) ([]*cadastro.Veiculo, error)
+}
+
+// ServicoRepositorio é a porta de persistência do catálogo de serviços.
+type ServicoRepositorio interface {
+	BuscarPorID(ctx context.Context, id string) (*catalogo.Servico, error)
+	Salvar(ctx context.Context, s *catalogo.Servico) error
+	Listar(ctx context.Context) ([]*catalogo.Servico, error)
+	Remover(ctx context.Context, id string) error
+}
+
+// VerificadorDeVeiculo confere se o veículo existe e pertence ao cliente, ao abrir a OS.
+type VerificadorDeVeiculo interface {
+	VeiculoDoCliente(ctx context.Context, clienteID, veiculoID string) error
 }

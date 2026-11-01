@@ -44,7 +44,7 @@ func novoAmbiente(t *testing.T) *ambiente {
 		t.Fatal(err)
 	}
 	t.Cleanup(func() { _ = db.Close() })
-	if _, err := db.ExecContext(ctx, `TRUNCATE os_historico, os_pecas, os_servicos, ordens_servico, itens_estoque, usuarios`); err != nil {
+	if _, err := db.ExecContext(ctx, `TRUNCATE os_historico, os_pecas, os_servicos, ordens_servico, itens_estoque, usuarios, veiculos, clientes, servicos_catalogo`); err != nil {
 		t.Fatal(err)
 	}
 
@@ -226,5 +226,51 @@ func TestSeedIdempotenteEMigracoesRepetiveis(t *testing.T) {
 	}
 	if conf, _ := u.SenhaConfere(ctx, "cli-demo", memoria.SenhaDemo); conf {
 		t.Error("cliente não pode autorizar desconto")
+	}
+}
+
+func TestCadastroECatalogoNoPostgres(t *testing.T) {
+	a := novoAmbiente(t)
+	ctx := context.Background()
+	tx := postgres.NovaTransacao(a.db)
+	cad := application.NovoCadastroService(postgres.NovosClientes(a.db), postgres.NovosVeiculos(a.db), tx)
+
+	if _, err := cad.CadastrarCliente(ctx, "c1", "529.982.247-25", "Maria", "maria@mail.com", "119", "Rua A"); err != nil {
+		t.Fatal(err)
+	}
+	if _, err := cad.CadastrarCliente(ctx, "c2", "52998224725", "Outra", "o@mail.com", "", ""); !errors.Is(err, application.ErrClienteJaExiste) {
+		t.Fatalf("CPF repetido deveria ser recusado: %v", err)
+	}
+	if _, err := cad.CadastrarVeiculo(ctx, "v1", "c1", "ABC1D23", "Renault", "Kwid", 2023, "Branco"); err != nil {
+		t.Fatal(err)
+	}
+	if _, err := cad.CadastrarVeiculo(ctx, "v2", "c1", "abc-1d23", "Fiat", "Uno", 2010, ""); !errors.Is(err, application.ErrPlacaJaCadastrada) {
+		t.Fatalf("placa repetida deveria ser recusada: %v", err)
+	}
+	if err := cad.VeiculoDoCliente(ctx, "c1", "v1"); err != nil {
+		t.Fatal(err)
+	}
+	if lista, err := cad.ListarVeiculosDoCliente(ctx, "c1"); err != nil || len(lista) != 1 {
+		t.Fatalf("listar veículos: %v %d", err, len(lista))
+	}
+	if lista, err := cad.ListarClientes(ctx); err != nil || len(lista) != 1 {
+		t.Fatalf("listar clientes: %v %d", err, len(lista))
+	}
+
+	cat := application.NovoCatalogoService(postgres.NovosServicos(a.db), tx)
+	if _, err := cat.Criar(ctx, "s1", "Alinhamento", 12000); err != nil {
+		t.Fatal(err)
+	}
+	if s, err := cat.Alterar(ctx, "s1", "Alinhamento 3D", 15000); err != nil || s.Preco().Centavos() != 15000 {
+		t.Fatalf("alterar: %v", err)
+	}
+	if lista, _ := cat.Listar(ctx); len(lista) != 1 {
+		t.Fatalf("esperava 1 serviço, veio %d", len(lista))
+	}
+	if err := cat.Remover(ctx, "s1"); err != nil {
+		t.Fatal(err)
+	}
+	if err := cat.Remover(ctx, "s1"); !errors.Is(err, application.ErrServicoNaoEncontrado) {
+		t.Fatalf("remover de novo deveria dar não encontrado: %v", err)
 	}
 }
