@@ -10,21 +10,35 @@ const SenhaDemo = "Teste@1234"
 
 // Semear cadastra o primeiro Administrador (RN14) e, se demo for true, um usuário de cada perfil.
 func Semear(u *Usuarios, adminDocumento, adminSenha string, demo bool) error {
+	iniciais, err := UsuariosIniciais(adminDocumento, adminSenha, demo)
+	if err != nil {
+		return err
+	}
+	for _, x := range iniciais {
+		u.Adicionar(x)
+	}
+	return nil
+}
+
+// UsuariosIniciais monta o Administrador (RN14) e, se demo for true, um usuário de cada perfil,
+// com a senha já em hash. Os repositórios usam a lista para semear o armazenamento.
+func UsuariosIniciais(adminDocumento, adminSenha string, demo bool) ([]identidade.Usuario, error) {
+	var out []identidade.Usuario
 	add := func(id, nome, doc string, p identidade.Perfil, clienteID, senha string) error {
 		h, err := seguranca.HashSenha(senha)
 		if err != nil {
 			return err
 		}
-		u.Adicionar(identidade.Usuario{ID: id, Nome: nome, Documento: doc, Perfil: p, ClienteID: clienteID, SenhaHash: h})
+		out = append(out, identidade.Usuario{ID: id, Nome: nome, Documento: doc, Perfil: p, ClienteID: clienteID, SenhaHash: h})
 		return nil
 	}
 	if adminDocumento != "" && adminSenha != "" {
 		if err := add("adm-1", "Administrador", adminDocumento, identidade.Administrador, "", adminSenha); err != nil {
-			return err
+			return nil, err
 		}
 	}
 	if !demo {
-		return nil
+		return out, nil
 	}
 	demos := []struct {
 		id, nome, doc string
@@ -40,8 +54,8 @@ func Semear(u *Usuarios, adminDocumento, adminSenha string, demo bool) error {
 	}
 	for _, d := range demos {
 		if err := add(d.id, d.nome, d.doc, d.p, d.cli, SenhaDemo); err != nil {
-			return err
+			return nil, err
 		}
 	}
-	return nil
+	return out, nil
 }
