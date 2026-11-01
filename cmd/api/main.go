@@ -2,6 +2,7 @@
 package main
 
 import (
+	"context"
 	"log"
 	"net/http"
 	"os"
@@ -9,6 +10,7 @@ import (
 
 	"github.com/EdgardMendessilva/soat-oficina-mecanica/internal/application"
 	"github.com/EdgardMendessilva/soat-oficina-mecanica/internal/infrastructure/memoria"
+	"github.com/EdgardMendessilva/soat-oficina-mecanica/internal/infrastructure/postgres"
 	"github.com/EdgardMendessilva/soat-oficina-mecanica/internal/infrastructure/seguranca"
 	apihttp "github.com/EdgardMendessilva/soat-oficina-mecanica/internal/interfaces/http"
 )
@@ -28,9 +30,36 @@ func main() {
 		log.Fatal(err)
 	}
 
-	ordens, itens, tx, usuarios := memoria.NovasOrdens(), memoria.NovoEstoque(), &memoria.Transacao{}, memoria.NovosUsuarios()
-	if err := memoria.Semear(usuarios, os.Getenv("ADMIN_DOCUMENTO"), os.Getenv("ADMIN_SENHA"), os.Getenv("SEED_DEMO") == "true"); err != nil {
-		log.Fatal(err)
+	var (
+		ordens   application.OrdemRepositorio
+		itens    application.EstoqueRepositorio
+		tx       application.Transacao
+		usuarios interface {
+			application.UsuarioRepositorio
+			application.AutorizadorGerente
+		}
+	)
+	adminDoc, adminSenha, demo := os.Getenv("ADMIN_DOCUMENTO"), os.Getenv("ADMIN_SENHA"), os.Getenv("SEED_DEMO") == "true"
+
+	if url := os.Getenv("DATABASE_URL"); url != "" {
+		ctx := context.Background()
+		db, err := postgres.Abrir(ctx, url)
+		if err != nil {
+			log.Fatal(err)
+		}
+		u := postgres.NovosUsuarios(db)
+		if err := postgres.Semear(ctx, u, adminDoc, adminSenha, demo); err != nil {
+			log.Fatal(err)
+		}
+		ordens, itens, tx, usuarios = postgres.NovasOrdens(db), postgres.NovoEstoque(db), postgres.NovaTransacao(db), u
+		log.Print("persistência: PostgreSQL")
+	} else {
+		u := memoria.NovosUsuarios()
+		if err := memoria.Semear(u, adminDoc, adminSenha, demo); err != nil {
+			log.Fatal(err)
+		}
+		ordens, itens, tx, usuarios = memoria.NovasOrdens(), memoria.NovoEstoque(), &memoria.Transacao{}, u
+		log.Print("persistência: memória (defina DATABASE_URL para usar o PostgreSQL)")
 	}
 
 	srv := apihttp.NovoServidor(
