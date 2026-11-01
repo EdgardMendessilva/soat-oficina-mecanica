@@ -16,7 +16,7 @@ func main() {
 
 	mux := http.NewServeMux()
 	mux.HandleFunc("/health", func(w http.ResponseWriter, _ *http.Request) {
-		fmt.Fprint(w, "ok")
+		_, _ = fmt.Fprint(w, "ok")
 	})
 
 	log.Printf("api ouvindo na porta %s", porta)
