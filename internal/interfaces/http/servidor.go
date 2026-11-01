@@ -23,15 +23,17 @@ var openapi []byte
 
 // Servidor junta os casos de uso e monta as rotas.
 type Servidor struct {
-	ordens  *application.OrdemDeServicoService
-	estoque *application.EstoqueService
-	login   *application.AutenticacaoService
-	jwt     *seguranca.EmissorJWT
+	ordens   *application.OrdemDeServicoService
+	estoque  *application.EstoqueService
+	login    *application.AutenticacaoService
+	cadastro *application.CadastroService
+	catalogo *application.CatalogoService
+	jwt      *seguranca.EmissorJWT
 }
 
 // NovoServidor monta o servidor.
-func NovoServidor(o *application.OrdemDeServicoService, e *application.EstoqueService, l *application.AutenticacaoService, j *seguranca.EmissorJWT) *Servidor {
-	return &Servidor{ordens: o, estoque: e, login: l, jwt: j}
+func NovoServidor(o *application.OrdemDeServicoService, e *application.EstoqueService, l *application.AutenticacaoService, c *application.CadastroService, cat *application.CatalogoService, j *seguranca.EmissorJWT) *Servidor {
+	return &Servidor{ordens: o, estoque: e, login: l, cadastro: c, catalogo: cat, jwt: j}
 }
 
 // Perfis que podem cada tipo de ação (seção 3 do escopo). Gerente e Administrador
@@ -69,6 +71,19 @@ func (s *Servidor) Rotas() http.Handler {
 	m.HandleFunc("POST /ordens/{id}/finalizacao", s.exigir(s.acao(s.ordens.Finalizar), oficina...))
 	m.HandleFunc("POST /ordens/{id}/entrega", s.exigir(s.acao(s.ordens.Entregar), atendimento...))
 	m.HandleFunc("GET /relatorios/tempo-medio-execucao", s.exigir(s.getTempoMedio, gerencia...))
+
+	m.HandleFunc("POST /clientes", s.exigir(s.postCliente, atendimento...))
+	m.HandleFunc("GET /clientes", s.exigir(s.getClientes, funcionario...))
+	m.HandleFunc("GET /clientes/{id}", s.exigir(s.getCliente))
+	m.HandleFunc("POST /veiculos", s.exigir(s.postVeiculo, atendimento...))
+	m.HandleFunc("GET /veiculos", s.exigir(s.getVeiculos))
+	m.HandleFunc("GET /veiculos/{id}", s.exigir(s.getVeiculo))
+
+	m.HandleFunc("POST /servicos", s.exigir(s.postServicoCatalogo, gerencia...))
+	m.HandleFunc("GET /servicos", s.exigir(s.getServicosCatalogo, funcionario...))
+	m.HandleFunc("GET /servicos/{id}", s.exigir(s.getServicoCatalogo, funcionario...))
+	m.HandleFunc("PUT /servicos/{id}", s.exigir(s.putServicoCatalogo, gerencia...))
+	m.HandleFunc("DELETE /servicos/{id}", s.exigir(s.deleteServicoCatalogo, gerencia...))
 
 	m.HandleFunc("POST /estoque", s.exigir(s.postItem, gerencia...))
 	m.HandleFunc("GET /estoque/{id}", s.exigir(s.getItem, funcionario...))

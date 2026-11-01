@@ -167,7 +167,7 @@
   "/ordens": {
    "post": {
     "summary": "Abre uma OS (status Recebida)",
-    "description": "Perfis: Atendente, Gerente, Administrador",
+    "description": "Perfis: Atendente, Gerente, Administrador. O veículo precisa existir e pertencer ao cliente.",
     "security": [
      {
       "bearerAuth": []
@@ -1419,6 +1419,677 @@
         "required": [
          "quantidade"
         ]
+       }
+      }
+     }
+    },
+    "parameters": [
+     {
+      "name": "id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string"
+      }
+     }
+    ]
+   }
+  },
+  "/clientes": {
+   "post": {
+    "summary": "Cadastra cliente por CPF ou CNPJ (RN01)",
+    "description": "Perfis: Atendente, Gerente, Administrador",
+    "security": [
+     {
+      "bearerAuth": []
+     }
+    ],
+    "responses": {
+     "201": {
+      "description": "Cliente cadastrado"
+     },
+     "401": {
+      "description": "Não autenticado",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Erro"
+        }
+       }
+      }
+     },
+     "403": {
+      "description": "Acesso negado",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Erro"
+        }
+       }
+      }
+     },
+     "409": {
+      "description": "Regra de negócio violada",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Erro"
+        }
+       }
+      }
+     },
+     "422": {
+      "description": "Dados inválidos",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Erro"
+        }
+       }
+      }
+     }
+    },
+    "requestBody": {
+     "required": true,
+     "content": {
+      "application/json": {
+       "schema": {
+        "type": "object",
+        "properties": {
+         "documento": {
+          "type": "string",
+          "example": "111.444.777-35"
+         },
+         "nome": {
+          "type": "string"
+         },
+         "email": {
+          "type": "string"
+         },
+         "telefone": {
+          "type": "string"
+         },
+         "endereco": {
+          "type": "string"
+         }
+        },
+        "required": [
+         "documento",
+         "nome",
+         "email"
+        ]
+       }
+      }
+     }
+    }
+   },
+   "get": {
+    "summary": "Lista os clientes",
+    "description": "Perfis: funcionários",
+    "security": [
+     {
+      "bearerAuth": []
+     }
+    ],
+    "responses": {
+     "200": {
+      "description": "Lista"
+     },
+     "401": {
+      "description": "Não autenticado",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Erro"
+        }
+       }
+      }
+     },
+     "403": {
+      "description": "Acesso negado",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Erro"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/clientes/{id}": {
+   "get": {
+    "summary": "Consulta um cliente (o cliente só vê o próprio, RN10)",
+    "description": "Perfis: qualquer usuário autenticado",
+    "security": [
+     {
+      "bearerAuth": []
+     }
+    ],
+    "responses": {
+     "200": {
+      "description": "Cliente"
+     },
+     "401": {
+      "description": "Não autenticado",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Erro"
+        }
+       }
+      }
+     },
+     "403": {
+      "description": "Acesso negado",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Erro"
+        }
+       }
+      }
+     },
+     "404": {
+      "description": "Não encontrado",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Erro"
+        }
+       }
+      }
+     }
+    },
+    "parameters": [
+     {
+      "name": "id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string"
+      }
+     }
+    ]
+   }
+  },
+  "/veiculos": {
+   "post": {
+    "summary": "Cadastra veículo: placa válida e única (RN02)",
+    "description": "Perfis: Atendente, Gerente, Administrador",
+    "security": [
+     {
+      "bearerAuth": []
+     }
+    ],
+    "responses": {
+     "201": {
+      "description": "Veículo cadastrado"
+     },
+     "401": {
+      "description": "Não autenticado",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Erro"
+        }
+       }
+      }
+     },
+     "403": {
+      "description": "Acesso negado",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Erro"
+        }
+       }
+      }
+     },
+     "404": {
+      "description": "Não encontrado",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Erro"
+        }
+       }
+      }
+     },
+     "409": {
+      "description": "Regra de negócio violada",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Erro"
+        }
+       }
+      }
+     },
+     "422": {
+      "description": "Dados inválidos",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Erro"
+        }
+       }
+      }
+     }
+    },
+    "requestBody": {
+     "required": true,
+     "content": {
+      "application/json": {
+       "schema": {
+        "type": "object",
+        "properties": {
+         "clienteId": {
+          "type": "string"
+         },
+         "placa": {
+          "type": "string",
+          "example": "ABC1D23"
+         },
+         "fabricante": {
+          "type": "string"
+         },
+         "modelo": {
+          "type": "string"
+         },
+         "ano": {
+          "type": "integer"
+         },
+         "cor": {
+          "type": "string"
+         }
+        },
+        "required": [
+         "clienteId",
+         "placa",
+         "fabricante",
+         "modelo",
+         "ano"
+        ]
+       }
+      }
+     }
+    }
+   },
+   "get": {
+    "summary": "Lista veículos (o cliente vê os próprios; o funcionário informa ?clienteId=)",
+    "description": "Perfis: qualquer usuário autenticado",
+    "security": [
+     {
+      "bearerAuth": []
+     }
+    ],
+    "responses": {
+     "200": {
+      "description": "Lista"
+     },
+     "401": {
+      "description": "Não autenticado",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Erro"
+        }
+       }
+      }
+     }
+    },
+    "parameters": [
+     {
+      "name": "clienteId",
+      "in": "query",
+      "required": false,
+      "schema": {
+       "type": "string"
+      }
+     }
+    ]
+   }
+  },
+  "/veiculos/{id}": {
+   "get": {
+    "summary": "Consulta um veículo (o cliente só vê os próprios, RN10)",
+    "description": "Perfis: qualquer usuário autenticado",
+    "security": [
+     {
+      "bearerAuth": []
+     }
+    ],
+    "responses": {
+     "200": {
+      "description": "Veículo"
+     },
+     "401": {
+      "description": "Não autenticado",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Erro"
+        }
+       }
+      }
+     },
+     "403": {
+      "description": "Acesso negado",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Erro"
+        }
+       }
+      }
+     },
+     "404": {
+      "description": "Não encontrado",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Erro"
+        }
+       }
+      }
+     }
+    },
+    "parameters": [
+     {
+      "name": "id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string"
+      }
+     }
+    ]
+   }
+  },
+  "/servicos": {
+   "post": {
+    "summary": "Cadastra serviço no catálogo",
+    "description": "Perfis: Gerente",
+    "security": [
+     {
+      "bearerAuth": []
+     }
+    ],
+    "responses": {
+     "201": {
+      "description": "Serviço criado"
+     },
+     "401": {
+      "description": "Não autenticado",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Erro"
+        }
+       }
+      }
+     },
+     "403": {
+      "description": "Acesso negado",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Erro"
+        }
+       }
+      }
+     },
+     "422": {
+      "description": "Dados inválidos",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Erro"
+        }
+       }
+      }
+     }
+    },
+    "requestBody": {
+     "required": true,
+     "content": {
+      "application/json": {
+       "schema": {
+        "type": "object",
+        "properties": {
+         "nome": {
+          "type": "string"
+         },
+         "precoCentavos": {
+          "type": "integer"
+         }
+        },
+        "required": [
+         "nome",
+         "precoCentavos"
+        ]
+       }
+      }
+     }
+    }
+   },
+   "get": {
+    "summary": "Lista o catálogo de serviços",
+    "description": "Perfis: funcionários",
+    "security": [
+     {
+      "bearerAuth": []
+     }
+    ],
+    "responses": {
+     "200": {
+      "description": "Lista"
+     },
+     "401": {
+      "description": "Não autenticado",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Erro"
+        }
+       }
+      }
+     },
+     "403": {
+      "description": "Acesso negado",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Erro"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/servicos/{id}": {
+   "get": {
+    "summary": "Consulta serviço do catálogo",
+    "description": "Perfis: funcionários",
+    "security": [
+     {
+      "bearerAuth": []
+     }
+    ],
+    "responses": {
+     "200": {
+      "description": "Serviço"
+     },
+     "401": {
+      "description": "Não autenticado",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Erro"
+        }
+       }
+      }
+     },
+     "403": {
+      "description": "Acesso negado",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Erro"
+        }
+       }
+      }
+     },
+     "404": {
+      "description": "Não encontrado",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Erro"
+        }
+       }
+      }
+     }
+    },
+    "parameters": [
+     {
+      "name": "id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string"
+      }
+     }
+    ]
+   },
+   "put": {
+    "summary": "Altera nome e preço do serviço",
+    "description": "Perfis: Gerente",
+    "security": [
+     {
+      "bearerAuth": []
+     }
+    ],
+    "responses": {
+     "200": {
+      "description": "Serviço alterado"
+     },
+     "401": {
+      "description": "Não autenticado",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Erro"
+        }
+       }
+      }
+     },
+     "403": {
+      "description": "Acesso negado",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Erro"
+        }
+       }
+      }
+     },
+     "404": {
+      "description": "Não encontrado",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Erro"
+        }
+       }
+      }
+     },
+     "422": {
+      "description": "Dados inválidos",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Erro"
+        }
+       }
+      }
+     }
+    },
+    "requestBody": {
+     "required": true,
+     "content": {
+      "application/json": {
+       "schema": {
+        "type": "object",
+        "properties": {
+         "nome": {
+          "type": "string"
+         },
+         "precoCentavos": {
+          "type": "integer"
+         }
+        },
+        "required": [
+         "nome",
+         "precoCentavos"
+        ]
+       }
+      }
+     }
+    },
+    "parameters": [
+     {
+      "name": "id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string"
+      }
+     }
+    ]
+   },
+   "delete": {
+    "summary": "Remove serviço do catálogo",
+    "description": "Perfis: Gerente",
+    "security": [
+     {
+      "bearerAuth": []
+     }
+    ],
+    "responses": {
+     "204": {
+      "description": "Removido"
+     },
+     "401": {
+      "description": "Não autenticado",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Erro"
+        }
+       }
+      }
+     },
+     "403": {
+      "description": "Acesso negado",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Erro"
+        }
+       }
+      }
+     },
+     "404": {
+      "description": "Não encontrado",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Erro"
+        }
        }
       }
      }

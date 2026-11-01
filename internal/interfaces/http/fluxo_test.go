@@ -2,6 +2,7 @@ package http_test
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"net/http"
 	"net/http/httptest"
@@ -30,13 +31,20 @@ func novoServidor(t *testing.T) http.Handler {
 	t.Helper()
 	jwt, _ := seguranca.NovoEmissorJWT("segredo-de-teste-123456", time.Hour, nil)
 	ordens, itens, tx, usuarios := memoria.NovasOrdens(), memoria.NovoEstoque(), &memoria.Transacao{}, memoria.NovosUsuarios()
+	clientes, veiculos, servicos := memoria.NovosClientes(), memoria.NovosVeiculos(), memoria.NovosServicos()
 	if err := memoria.Semear(usuarios, "", "", true); err != nil {
 		t.Fatal(err)
 	}
+	if err := memoria.SemearCadastro(context.Background(), clientes, veiculos); err != nil {
+		t.Fatal(err)
+	}
+	cad := application.NovoCadastroService(clientes, veiculos, tx)
 	return apihttp.NovoServidor(
-		application.NovoOrdemDeServicoService(ordens, itens, tx, usuarios, relogio{}),
+		application.NovoOrdemDeServicoService(ordens, itens, tx, usuarios, relogio{}).ComCadastro(cad),
 		application.NovoEstoqueService(itens, tx),
 		application.NovoAutenticacaoService(usuarios, seguranca.Verificador{}),
+		cad,
+		application.NovoCatalogoService(servicos, tx),
 		jwt,
 	).Rotas()
 }
@@ -87,7 +95,7 @@ func TestFluxoCompletoDaOS(t *testing.T) {
 
 	c.espera(201, "POST", "/estoque", ger, map[string]any{"id": "filtro", "nome": "Filtro de óleo", "saldo": 5})
 
-	os := c.espera(201, "POST", "/ordens", ate, map[string]any{"clienteId": "cli-demo", "veiculoId": "v1", "valorDoOrcamentoCentavos": 25000})
+	os := c.espera(201, "POST", "/ordens", ate, map[string]any{"clienteId": "cli-demo", "veiculoId": "veic-demo", "valorDoOrcamentoCentavos": 25000})
 	id := os["id"].(string)
 	base := "/ordens/" + id
 
@@ -131,7 +139,7 @@ func TestFluxoCompletoDaOS(t *testing.T) {
 func TestReprovacaoCobraSoOValorDoOrcamento(t *testing.T) {
 	c := cliente{t, novoServidor(t)}
 	ate, mec, cli := c.login(cpfAtendente), c.login(cpfMecanico), c.login(cpfCliente)
-	id := c.espera(201, "POST", "/ordens", ate, map[string]any{"clienteId": "cli-demo", "veiculoId": "v1", "valorDoOrcamentoCentavos": 25000})["id"].(string)
+	id := c.espera(201, "POST", "/ordens", ate, map[string]any{"clienteId": "cli-demo", "veiculoId": "veic-demo", "valorDoOrcamentoCentavos": 25000})["id"].(string)
 	base := "/ordens/" + id
 	c.espera(200, "POST", base+"/diagnostico", mec, nil)
 	c.espera(200, "POST", base+"/servicos", mec, map[string]any{"descricao": "Revisão", "precoCentavos": 90000})
@@ -145,7 +153,7 @@ func TestReprovacaoCobraSoOValorDoOrcamento(t *testing.T) {
 func TestClienteSoEnxergaAsPropriasOS(t *testing.T) {
 	c := cliente{t, novoServidor(t)}
 	ate := c.login(cpfAtendente)
-	id := c.espera(201, "POST", "/ordens", ate, map[string]any{"clienteId": "cli-demo", "veiculoId": "v1", "valorDoOrcamentoCentavos": 1000})["id"].(string)
+	id := c.espera(201, "POST", "/ordens", ate, map[string]any{"clienteId": "cli-demo", "veiculoId": "veic-demo", "valorDoOrcamentoCentavos": 1000})["id"].(string)
 
 	c.espera(200, "GET", "/ordens/"+id, c.login(cpfCliente), nil)
 	c.espera(403, "GET", "/ordens/"+id, c.login(cpfOutro), nil) // RN10
@@ -188,7 +196,7 @@ func TestEstoqueNaoFicaNegativoNaAprovacao(t *testing.T) {
 	ger, ate, mec, cli := c.login(cpfGerente), c.login(cpfAtendente), c.login(cpfMecanico), c.login(cpfCliente)
 	c.espera(201, "POST", "/estoque", ger, map[string]any{"id": "vela", "nome": "Vela", "saldo": 1})
 	c.espera(409, "POST", "/estoque", ger, map[string]any{"id": "vela", "nome": "Vela", "saldo": 1})
-	id := c.espera(201, "POST", "/ordens", ate, map[string]any{"clienteId": "cli-demo", "veiculoId": "v1", "valorDoOrcamentoCentavos": 100})["id"].(string)
+	id := c.espera(201, "POST", "/ordens", ate, map[string]any{"clienteId": "cli-demo", "veiculoId": "veic-demo", "valorDoOrcamentoCentavos": 100})["id"].(string)
 	base := "/ordens/" + id
 	c.espera(200, "POST", base+"/diagnostico", mec, nil)
 	c.espera(200, "POST", base+"/pecas", mec, map[string]any{"pecaId": "vela", "descricao": "Vela", "precoUnitarioCentavos": 100, "quantidade": 4})
@@ -197,4 +205,68 @@ func TestEstoqueNaoFicaNegativoNaAprovacao(t *testing.T) {
 	if i := c.espera(200, "GET", "/estoque/vela", ger, nil); i["saldo"].(float64) != 1 {
 		t.Fatalf("saldo mudou numa aprovação recusada: %v", i)
 	}
+}
+
+func TestCadastroDeClienteEVeiculo(t *testing.T) {
+	c := cliente{t, novoServidor(t)}
+	ate, ger, cli := c.login(cpfAtendente), c.login(cpfGerente), c.login(cpfCliente)
+
+	// CPF e CNPJ aceitos, inválido recusado, repetido recusado (RN01)
+	novo := c.espera(201, "POST", "/clientes", ate, map[string]any{"documento": "111.444.777-35", "nome": "João", "email": "joao@mail.com"})
+	c.espera(201, "POST", "/clientes", ate, map[string]any{"documento": "11.222.333/0001-81", "nome": "Oficina Y", "email": "y@mail.com"})
+	c.espera(422, "POST", "/clientes", ate, map[string]any{"documento": "111.111.111-11", "nome": "X", "email": "x@mail.com"})
+	c.espera(409, "POST", "/clientes", ate, map[string]any{"documento": "111.444.777-35", "nome": "João", "email": "joao@mail.com"})
+	c.espera(403, "POST", "/clientes", cli, map[string]any{"documento": "529.982.247-25", "nome": "X", "email": "x@mail.com"})
+
+	// veículo: placa válida e única (RN02), cliente precisa existir
+	id := novo["id"].(string)
+	v := c.espera(201, "POST", "/veiculos", ate, map[string]any{"clienteId": id, "placa": "def-4e56", "fabricante": "Fiat", "modelo": "Uno", "ano": 2018, "cor": "Preto"})
+	if v["placa"] != "DEF4E56" {
+		t.Fatalf("placa não normalizada: %v", v)
+	}
+	c.espera(409, "POST", "/veiculos", ate, map[string]any{"clienteId": id, "placa": "DEF4E56", "fabricante": "Fiat", "modelo": "Uno", "ano": 2018})
+	c.espera(422, "POST", "/veiculos", ate, map[string]any{"clienteId": id, "placa": "ZZZ", "fabricante": "Fiat", "modelo": "Uno", "ano": 2018})
+	c.espera(404, "POST", "/veiculos", ate, map[string]any{"clienteId": "nao-existe", "placa": "GHI5J67", "fabricante": "Fiat", "modelo": "Uno", "ano": 2018})
+
+	// a OS só abre com veículo do próprio cliente
+	c.espera(422, "POST", "/ordens", ate, map[string]any{"clienteId": "cli-demo", "veiculoId": v["id"], "valorDoOrcamentoCentavos": 1000})
+	c.espera(404, "POST", "/ordens", ate, map[string]any{"clienteId": "cli-demo", "veiculoId": "nao-existe", "valorDoOrcamentoCentavos": 1000})
+	c.espera(201, "POST", "/ordens", ate, map[string]any{"clienteId": id, "veiculoId": v["id"], "valorDoOrcamentoCentavos": 1000})
+
+	// isolamento do cliente (RN10)
+	c.espera(200, "GET", "/clientes/cli-demo", cli, nil)
+	c.espera(403, "GET", "/clientes/cli-outro", cli, nil)
+	c.espera(200, "GET", "/veiculos/veic-demo", cli, nil)
+	c.espera(403, "GET", "/veiculos/veic-outro", cli, nil)
+	c.espera(200, "GET", "/clientes", ger, nil)
+	c.espera(403, "GET", "/clientes", cli, nil)
+	c.espera(400, "GET", "/veiculos", ger, nil)
+	code, _ := c.chamar("GET", "/veiculos?clienteId=cli-demo", ger, nil)
+	if code != 200 {
+		t.Fatalf("listar veículos: %d", code)
+	}
+}
+
+func TestCatalogoDeServicos(t *testing.T) {
+	c := cliente{t, novoServidor(t)}
+	ger, mec, ate := c.login(cpfGerente), c.login(cpfMecanico), c.login(cpfAtendente)
+
+	s := c.espera(201, "POST", "/servicos", ger, map[string]any{"nome": "Alinhamento", "precoCentavos": 12000})
+	id := s["id"].(string)
+	c.espera(403, "POST", "/servicos", ate, map[string]any{"nome": "X", "precoCentavos": 1})
+	c.espera(422, "POST", "/servicos", ger, map[string]any{"nome": " ", "precoCentavos": 1})
+	c.espera(422, "POST", "/servicos", ger, map[string]any{"nome": "Negativo", "precoCentavos": -5})
+
+	c.espera(200, "GET", "/servicos", mec, nil)
+	if got := c.espera(200, "GET", "/servicos/"+id, mec, nil); got["nome"] != "Alinhamento" {
+		t.Fatalf("consulta errada: %v", got)
+	}
+	if got := c.espera(200, "PUT", "/servicos/"+id, ger, map[string]any{"nome": "Alinhamento 3D", "precoCentavos": 15000}); got["precoCentavos"].(float64) != 15000 {
+		t.Fatalf("alteração errada: %v", got)
+	}
+	c.espera(404, "PUT", "/servicos/nao-existe", ger, map[string]any{"nome": "X", "precoCentavos": 1})
+	c.espera(403, "DELETE", "/servicos/"+id, mec, nil)
+	c.espera(204, "DELETE", "/servicos/"+id, ger, nil)
+	c.espera(404, "GET", "/servicos/"+id, ger, nil)
+	c.espera(404, "DELETE", "/servicos/"+id, ger, nil)
 }
