@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/EdgardMendessilva/soat-oficina-mecanica/internal/domain/estoque"
+	"github.com/EdgardMendessilva/soat-oficina-mecanica/internal/domain/identidade"
 	"github.com/EdgardMendessilva/soat-oficina-mecanica/internal/domain/ordemservico"
 )
 
@@ -39,4 +40,14 @@ type AutorizadorGerente interface {
 // Relogio entrega a hora atual; existe para os testes controlarem o tempo.
 type Relogio interface {
 	Agora() time.Time
+}
+
+// UsuarioRepositorio busca quem tenta entrar, pelo CPF já normalizado.
+type UsuarioRepositorio interface {
+	BuscarPorDocumento(ctx context.Context, documento string) (identidade.Usuario, error)
+}
+
+// VerificadorSenha compara a senha digitada com o hash guardado.
+type VerificadorSenha interface {
+	Conferir(senha, hash string) bool
 }
