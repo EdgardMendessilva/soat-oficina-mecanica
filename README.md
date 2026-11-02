@@ -125,6 +125,10 @@ Alternativas descartadas (MongoDB, MySQL, SQLite) em [`docs/adr/0002-banco-postg
 
 [`docs/ddd`](docs/ddd): Event Storming dos três fluxos (criação, acompanhamento e gestão de peças e insumos), eventos, comandos, políticas, atores, agregados, entidades, objetos de valor, contextos delimitados, diagramas, linguagem ubíqua e a relação da documentação com o código. Há também os PDFs `event-storming.pdf` e `diagramas.pdf`.
 
+## Análise de vulnerabilidades
+
+O `govulncheck` encontrou 12 vulnerabilidades na biblioteca padrão do Go 1.26.5. Todas foram corrigidas com a atualização para o Go 1.26.10, e o novo scan não encontra nenhuma. Relatório: [`docs/seguranca/relatorio-vulnerabilidades.md`](docs/seguranca/relatorio-vulnerabilidades.md).
+
 ## Estrutura dos diretórios
 
 ```
@@ -137,6 +141,7 @@ docs/adr/                      decisões de arquitetura
 docs/requisitos/               escopo e regras de negócio
 docs/ddd/                      documentação DDD
 docs/postman/                  coleção de requisições
+docs/seguranca/                relatório e evidências da análise de vulnerabilidades
 .github/workflows/ci.yml       pipeline de integração contínua
 Dockerfile, docker-compose.yml build e ambiente completo
 ```
@@ -147,4 +152,4 @@ Primeiro acesso por e-mail e cadastro de funcionários pela API (modelados nas r
 
 ## Vídeo da entrega
 
-<LINK DO VÍDEO NO YOUTUBE>
+Playlist no YouTube, em três partes (arquitetura e DDD, demonstração da API e análise de vulnerabilidades): https://www.youtube.com/playlist?list=PLQCKxyEkd78U
