@@ -1,0 +1,7 @@
+# Saída bruta do govulncheck DEPOIS da correção
+# Data: 2026-11-02
+# Commit analisado: df5129a (main, após o merge do PR de atualização do Go)
+# Toolchain: go1.26.10
+# Comando: govulncheck ./...
+
+No vulnerabilities found.
