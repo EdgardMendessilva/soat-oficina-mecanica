@@ -1,0 +1,412 @@
+# Saída bruta do govulncheck ANTES da correção
+# Data: 2026-11-02
+# Commit analisado: 20702ca (main, antes do PR de atualização do Go)
+# Toolchain: go1.26.5
+# Comando: govulncheck ./...
+#
+=== Symbol Results ===
+
+Vulnerability #1: GO-2026-6809
+    Distrust compromised intermediate certificates in crypto/x509
+  More info: https://pkg.go.dev/vuln/GO-2026-6809
+  Standard library
+    Found in: crypto/x509@go1.26.5
+    Fixed in: crypto/x509@go1.26.10
+    Example traces found:
+      #1: cmd/api/main.go:88:28: api.main calls http.Server.ListenAndServe, which eventually calls x509.Certificate.Verify
+
+Vulnerability #2: GO-2026-6617
+    HTTP/2 server crash due to HPACK encoder race in net/http
+  More info: https://pkg.go.dev/vuln/GO-2026-6617
+  Standard library
+    Found in: net/http@go1.26.5
+    Fixed in: net/http@go1.26.9
+    Example traces found:
+      #1: internal/domain/valueobject/dinheiro.go:52:20: valueobject.Dinheiro.String calls fmt.Sprintf, which eventually calls http.CanonicalHeaderKey
+      #2: internal/domain/valueobject/dinheiro.go:52:20: valueobject.Dinheiro.String calls fmt.Sprintf, which eventually calls http.CanonicalHeaderKey
+      #3: internal/interfaces/http/servidor.go:51:14: http.Servidor.Rotas calls http.ServeMux.HandleFunc
+      #4: internal/interfaces/http/servidor.go:51:14: http.Servidor.Rotas calls http.ServeMux.HandleFunc
+      #5: cmd/api/main.go:88:28: api.main calls http.Server.ListenAndServe
+      #6: cmd/api/main.go:88:28: api.main calls http.Server.ListenAndServe
+      #7: internal/infrastructure/seguranca/senha.go:18:24: seguranca.HashSenha calls rand.Read, which eventually calls http.body.Read
+      #8: internal/infrastructure/seguranca/senha.go:18:24: seguranca.HashSenha calls rand.Read, which eventually calls http.body.Read
+      #9: internal/infrastructure/seguranca/senha.go:18:24: seguranca.HashSenha calls rand.Read, which eventually calls http.bodyEOFSignal.Read
+      #10: internal/infrastructure/seguranca/senha.go:18:24: seguranca.HashSenha calls rand.Read, which eventually calls http.bodyEOFSignal.Read
+      #11: internal/infrastructure/seguranca/senha.go:18:24: seguranca.HashSenha calls rand.Read, which eventually calls http.bodyLocked.Read
+      #12: internal/infrastructure/seguranca/senha.go:18:24: seguranca.HashSenha calls rand.Read, which eventually calls http.bodyLocked.Read
+      #13: internal/infrastructure/postgres/conexao.go:90:22: postgres.Migrar calls sql.Tx.Commit, which eventually calls http.checkConnErrorWriter.Write
+      #14: internal/infrastructure/postgres/conexao.go:90:22: postgres.Migrar calls sql.Tx.Commit, which eventually calls http.checkConnErrorWriter.Write
+      #15: internal/infrastructure/postgres/conexao.go:90:22: postgres.Migrar calls sql.Tx.Commit, which eventually calls http.chunkWriter.Write
+      #16: internal/infrastructure/postgres/conexao.go:90:22: postgres.Migrar calls sql.Tx.Commit, which eventually calls http.chunkWriter.Write
+      #17: internal/infrastructure/seguranca/senha.go:18:24: seguranca.HashSenha calls rand.Read, which eventually calls http.connReader.Read
+      #18: internal/infrastructure/seguranca/senha.go:18:24: seguranca.HashSenha calls rand.Read, which eventually calls http.connReader.Read
+      #19: internal/infrastructure/seguranca/senha.go:18:24: seguranca.HashSenha calls rand.Read, which eventually calls http.expectContinueReader.Read
+      #20: internal/infrastructure/seguranca/senha.go:18:24: seguranca.HashSenha calls rand.Read, which eventually calls http.expectContinueReader.Read
+      #21: internal/domain/valueobject/dinheiro.go:52:20: valueobject.Dinheiro.String calls fmt.Sprintf, which eventually calls http.http2ConnectionError.Error
+      #22: internal/domain/valueobject/dinheiro.go:52:20: valueobject.Dinheiro.String calls fmt.Sprintf, which eventually calls http.http2ConnectionError.Error
+      #23: internal/domain/valueobject/dinheiro.go:52:20: valueobject.Dinheiro.String calls fmt.Sprintf, which eventually calls http.http2ErrCode.String
+      #24: internal/domain/valueobject/dinheiro.go:52:20: valueobject.Dinheiro.String calls fmt.Sprintf, which eventually calls http.http2ErrCode.String
+      #25: internal/domain/valueobject/dinheiro.go:52:20: valueobject.Dinheiro.String calls fmt.Sprintf, which eventually calls http.http2FrameHeader.String
+      #26: internal/domain/valueobject/dinheiro.go:52:20: valueobject.Dinheiro.String calls fmt.Sprintf, which eventually calls http.http2FrameHeader.String
+      #27: internal/domain/valueobject/dinheiro.go:52:20: valueobject.Dinheiro.String calls fmt.Sprintf, which eventually calls http.http2FrameType.String
+      #28: internal/domain/valueobject/dinheiro.go:52:20: valueobject.Dinheiro.String calls fmt.Sprintf, which eventually calls http.http2FrameType.String
+      #29: internal/domain/valueobject/dinheiro.go:52:20: valueobject.Dinheiro.String calls fmt.Sprintf, which eventually calls http.http2FrameWriteRequest.String
+      #30: internal/domain/valueobject/dinheiro.go:52:20: valueobject.Dinheiro.String calls fmt.Sprintf, which eventually calls http.http2FrameWriteRequest.String
+      #31: internal/domain/valueobject/dinheiro.go:52:20: valueobject.Dinheiro.String calls fmt.Sprintf, which eventually calls http.http2Setting.String
+      #32: internal/domain/valueobject/dinheiro.go:52:20: valueobject.Dinheiro.String calls fmt.Sprintf, which eventually calls http.http2Setting.String
+      #33: internal/domain/valueobject/dinheiro.go:52:20: valueobject.Dinheiro.String calls fmt.Sprintf, which eventually calls http.http2SettingID.String
+      #34: internal/domain/valueobject/dinheiro.go:52:20: valueobject.Dinheiro.String calls fmt.Sprintf, which eventually calls http.http2SettingID.String
+      #35: internal/infrastructure/seguranca/senha.go:18:24: seguranca.HashSenha calls rand.Read, which calls http.http2StreamError.Error
+      #36: internal/infrastructure/seguranca/senha.go:18:24: seguranca.HashSenha calls rand.Read, which calls http.http2StreamError.Error
+      #37: internal/infrastructure/postgres/conexao.go:90:22: postgres.Migrar calls sql.Tx.Commit, which eventually calls http.http2bufferedWriterTimeoutWriter.Write
+      #38: internal/infrastructure/postgres/conexao.go:90:22: postgres.Migrar calls sql.Tx.Commit, which eventually calls http.http2bufferedWriterTimeoutWriter.Write
+      #39: internal/infrastructure/postgres/conexao.go:90:22: postgres.Migrar calls sql.Tx.Commit, which eventually calls http.http2chunkWriter.Write
+      #40: internal/infrastructure/postgres/conexao.go:90:22: postgres.Migrar calls sql.Tx.Commit, which eventually calls http.http2chunkWriter.Write
+      #41: internal/domain/valueobject/dinheiro.go:52:20: valueobject.Dinheiro.String calls fmt.Sprintf, which eventually calls http.http2connError.Error
+      #42: internal/domain/valueobject/dinheiro.go:52:20: valueobject.Dinheiro.String calls fmt.Sprintf, which eventually calls http.http2connError.Error
+      #43: internal/infrastructure/seguranca/senha.go:18:24: seguranca.HashSenha calls rand.Read, which eventually calls http.http2duplicatePseudoHeaderError.Error
+      #44: internal/infrastructure/seguranca/senha.go:18:24: seguranca.HashSenha calls rand.Read, which eventually calls http.http2duplicatePseudoHeaderError.Error
+      #45: internal/infrastructure/seguranca/senha.go:18:24: seguranca.HashSenha calls rand.Read, which eventually calls http.http2headerFieldNameError.Error
+      #46: internal/infrastructure/seguranca/senha.go:18:24: seguranca.HashSenha calls rand.Read, which eventually calls http.http2headerFieldNameError.Error
+      #47: internal/infrastructure/seguranca/senha.go:18:24: seguranca.HashSenha calls rand.Read, which eventually calls http.http2headerFieldValueError.Error
+      #48: internal/infrastructure/seguranca/senha.go:18:24: seguranca.HashSenha calls rand.Read, which eventually calls http.http2headerFieldValueError.Error
+      #49: internal/infrastructure/seguranca/senha.go:18:24: seguranca.HashSenha calls rand.Read, which eventually calls http.http2pseudoHeaderError.Error
+      #50: internal/infrastructure/seguranca/senha.go:18:24: seguranca.HashSenha calls rand.Read, which eventually calls http.http2pseudoHeaderError.Error
+      #51: internal/infrastructure/seguranca/senha.go:18:24: seguranca.HashSenha calls rand.Read, which eventually calls http.http2requestBody.Read
+      #52: internal/infrastructure/seguranca/senha.go:18:24: seguranca.HashSenha calls rand.Read, which eventually calls http.http2requestBody.Read
+      #53: internal/domain/valueobject/dinheiro.go:52:20: valueobject.Dinheiro.String calls fmt.Sprintf, which eventually calls http.http2responseWriter.Write
+      #54: internal/domain/valueobject/dinheiro.go:52:20: valueobject.Dinheiro.String calls fmt.Sprintf, which eventually calls http.http2responseWriter.Write
+      #55: internal/infrastructure/seguranca/senha.go:18:24: seguranca.HashSenha calls rand.Read, which eventually calls http.http2responseWriter.WriteString
+      #56: internal/infrastructure/seguranca/senha.go:18:24: seguranca.HashSenha calls rand.Read, which eventually calls http.http2responseWriter.WriteString
+      #57: internal/domain/valueobject/dinheiro.go:52:20: valueobject.Dinheiro.String calls fmt.Sprintf, which eventually calls http.http2writeData.String
+      #58: internal/domain/valueobject/dinheiro.go:52:20: valueobject.Dinheiro.String calls fmt.Sprintf, which eventually calls http.http2writeData.String
+      #59: internal/infrastructure/seguranca/senha.go:18:24: seguranca.HashSenha calls rand.Read, which eventually calls http.loggingConn.Read
+      #60: internal/infrastructure/seguranca/senha.go:18:24: seguranca.HashSenha calls rand.Read, which eventually calls http.loggingConn.Read
+      #61: internal/infrastructure/postgres/conexao.go:90:22: postgres.Migrar calls sql.Tx.Commit, which eventually calls http.loggingConn.Write
+      #62: internal/infrastructure/postgres/conexao.go:90:22: postgres.Migrar calls sql.Tx.Commit, which eventually calls http.loggingConn.Write
+      #63: internal/infrastructure/seguranca/senha.go:18:24: seguranca.HashSenha calls rand.Read, which eventually calls http.maxBytesReader.Read
+      #64: internal/infrastructure/seguranca/senha.go:18:24: seguranca.HashSenha calls rand.Read, which eventually calls http.maxBytesReader.Read
+      #65: internal/infrastructure/postgres/conexao.go:78:26: postgres.Migrar calls sql.Conn.BeginTx, which eventually calls http.onceCloseListener.Close
+      #66: internal/infrastructure/postgres/conexao.go:78:26: postgres.Migrar calls sql.Conn.BeginTx, which eventually calls http.onceCloseListener.Close
+      #67: internal/domain/valueobject/dinheiro.go:52:20: valueobject.Dinheiro.String calls fmt.Sprintf, which eventually calls http.response.Write
+      #68: internal/domain/valueobject/dinheiro.go:52:20: valueobject.Dinheiro.String calls fmt.Sprintf, which eventually calls http.response.Write
+
+Vulnerability #3: GO-2026-6613
+    HTTP/1 server connection desynchronization after 2xx CONNECT response in
+    net/http
+  More info: https://pkg.go.dev/vuln/GO-2026-6613
+  Standard library
+    Found in: net/http@go1.26.5
+    Fixed in: net/http@go1.26.9
+    Example traces found:
+      #1: internal/infrastructure/postgres/conexao.go:90:22: postgres.Migrar calls sql.Tx.Commit, which eventually calls http.CanonicalHeaderKey
+      #2: internal/infrastructure/postgres/conexao.go:90:22: postgres.Migrar calls sql.Tx.Commit, which eventually calls http.Header.Del
+      #3: internal/infrastructure/postgres/conexao.go:90:22: postgres.Migrar calls sql.Tx.Commit, which eventually calls http.Header.Get
+      #4: internal/interfaces/http/servidor.go:51:14: http.Servidor.Rotas calls http.ServeMux.HandleFunc
+      #5: cmd/api/main.go:88:28: api.main calls http.Server.ListenAndServe
+      #6: internal/infrastructure/seguranca/senha.go:18:24: seguranca.HashSenha calls rand.Read, which eventually calls http.body.Read
+      #7: internal/infrastructure/seguranca/senha.go:18:24: seguranca.HashSenha calls rand.Read, which eventually calls http.bodyEOFSignal.Read
+      #8: internal/infrastructure/seguranca/senha.go:18:24: seguranca.HashSenha calls rand.Read, which eventually calls http.bodyLocked.Read
+      #9: internal/infrastructure/postgres/conexao.go:90:22: postgres.Migrar calls sql.Tx.Commit, which eventually calls http.checkConnErrorWriter.Write
+      #10: internal/infrastructure/postgres/conexao.go:90:22: postgres.Migrar calls sql.Tx.Commit, which eventually calls http.chunkWriter.Write
+      #11: internal/infrastructure/seguranca/senha.go:18:24: seguranca.HashSenha calls rand.Read, which eventually calls http.connReader.Read
+      #12: internal/infrastructure/seguranca/senha.go:18:24: seguranca.HashSenha calls rand.Read, which eventually calls http.expectContinueReader.Read
+      #13: internal/infrastructure/seguranca/senha.go:18:24: seguranca.HashSenha calls rand.Read, which eventually calls http.loggingConn.Read
+      #14: internal/infrastructure/postgres/conexao.go:90:22: postgres.Migrar calls sql.Tx.Commit, which eventually calls http.loggingConn.Write
+      #15: internal/infrastructure/seguranca/senha.go:18:24: seguranca.HashSenha calls rand.Read, which eventually calls http.maxBytesReader.Read
+      #16: internal/infrastructure/postgres/conexao.go:78:26: postgres.Migrar calls sql.Conn.BeginTx, which eventually calls http.onceCloseListener.Close
+      #17: internal/domain/valueobject/dinheiro.go:52:20: valueobject.Dinheiro.String calls fmt.Sprintf, which eventually calls http.response.Write
+
+Vulnerability #4: GO-2026-6612
+    Double flow control refund on HTTP/2 server streams in net/http
+  More info: https://pkg.go.dev/vuln/GO-2026-6612
+  Standard library
+    Found in: net/http@go1.26.5
+    Fixed in: net/http@go1.26.9
+    Example traces found:
+      #1: internal/domain/valueobject/dinheiro.go:52:20: valueobject.Dinheiro.String calls fmt.Sprintf, which eventually calls http.CanonicalHeaderKey
+      #2: internal/domain/valueobject/dinheiro.go:52:20: valueobject.Dinheiro.String calls fmt.Sprintf, which eventually calls http.CanonicalHeaderKey
+      #3: internal/interfaces/http/servidor.go:51:14: http.Servidor.Rotas calls http.ServeMux.HandleFunc
+      #4: internal/interfaces/http/servidor.go:51:14: http.Servidor.Rotas calls http.ServeMux.HandleFunc
+      #5: cmd/api/main.go:88:28: api.main calls http.Server.ListenAndServe
+      #6: cmd/api/main.go:88:28: api.main calls http.Server.ListenAndServe
+      #7: internal/infrastructure/seguranca/senha.go:18:24: seguranca.HashSenha calls rand.Read, which eventually calls http.body.Read
+      #8: internal/infrastructure/seguranca/senha.go:18:24: seguranca.HashSenha calls rand.Read, which eventually calls http.body.Read
+      #9: internal/infrastructure/seguranca/senha.go:18:24: seguranca.HashSenha calls rand.Read, which eventually calls http.bodyEOFSignal.Read
+      #10: internal/infrastructure/seguranca/senha.go:18:24: seguranca.HashSenha calls rand.Read, which eventually calls http.bodyEOFSignal.Read
+      #11: internal/infrastructure/seguranca/senha.go:18:24: seguranca.HashSenha calls rand.Read, which eventually calls http.bodyLocked.Read
+      #12: internal/infrastructure/seguranca/senha.go:18:24: seguranca.HashSenha calls rand.Read, which eventually calls http.bodyLocked.Read
+      #13: internal/infrastructure/postgres/conexao.go:90:22: postgres.Migrar calls sql.Tx.Commit, which eventually calls http.checkConnErrorWriter.Write
+      #14: internal/infrastructure/postgres/conexao.go:90:22: postgres.Migrar calls sql.Tx.Commit, which eventually calls http.checkConnErrorWriter.Write
+      #15: internal/infrastructure/postgres/conexao.go:90:22: postgres.Migrar calls sql.Tx.Commit, which eventually calls http.chunkWriter.Write
+      #16: internal/infrastructure/postgres/conexao.go:90:22: postgres.Migrar calls sql.Tx.Commit, which eventually calls http.chunkWriter.Write
+      #17: internal/infrastructure/seguranca/senha.go:18:24: seguranca.HashSenha calls rand.Read, which eventually calls http.connReader.Read
+      #18: internal/infrastructure/seguranca/senha.go:18:24: seguranca.HashSenha calls rand.Read, which eventually calls http.connReader.Read
+      #19: internal/infrastructure/seguranca/senha.go:18:24: seguranca.HashSenha calls rand.Read, which eventually calls http.expectContinueReader.Read
+      #20: internal/infrastructure/seguranca/senha.go:18:24: seguranca.HashSenha calls rand.Read, which eventually calls http.expectContinueReader.Read
+      #21: internal/domain/valueobject/dinheiro.go:52:20: valueobject.Dinheiro.String calls fmt.Sprintf, which eventually calls http.http2ConnectionError.Error
+      #22: internal/domain/valueobject/dinheiro.go:52:20: valueobject.Dinheiro.String calls fmt.Sprintf, which eventually calls http.http2ConnectionError.Error
+      #23: internal/domain/valueobject/dinheiro.go:52:20: valueobject.Dinheiro.String calls fmt.Sprintf, which eventually calls http.http2ErrCode.String
+      #24: internal/domain/valueobject/dinheiro.go:52:20: valueobject.Dinheiro.String calls fmt.Sprintf, which eventually calls http.http2ErrCode.String
+      #25: internal/domain/valueobject/dinheiro.go:52:20: valueobject.Dinheiro.String calls fmt.Sprintf, which eventually calls http.http2FrameHeader.String
+      #26: internal/domain/valueobject/dinheiro.go:52:20: valueobject.Dinheiro.String calls fmt.Sprintf, which eventually calls http.http2FrameHeader.String
+      #27: internal/domain/valueobject/dinheiro.go:52:20: valueobject.Dinheiro.String calls fmt.Sprintf, which eventually calls http.http2FrameType.String
+      #28: internal/domain/valueobject/dinheiro.go:52:20: valueobject.Dinheiro.String calls fmt.Sprintf, which eventually calls http.http2FrameType.String
+      #29: internal/domain/valueobject/dinheiro.go:52:20: valueobject.Dinheiro.String calls fmt.Sprintf, which eventually calls http.http2FrameWriteRequest.String
+      #30: internal/domain/valueobject/dinheiro.go:52:20: valueobject.Dinheiro.String calls fmt.Sprintf, which eventually calls http.http2FrameWriteRequest.String
+      #31: internal/domain/valueobject/dinheiro.go:52:20: valueobject.Dinheiro.String calls fmt.Sprintf, which eventually calls http.http2Setting.String
+      #32: internal/domain/valueobject/dinheiro.go:52:20: valueobject.Dinheiro.String calls fmt.Sprintf, which eventually calls http.http2Setting.String
+      #33: internal/domain/valueobject/dinheiro.go:52:20: valueobject.Dinheiro.String calls fmt.Sprintf, which eventually calls http.http2SettingID.String
+      #34: internal/domain/valueobject/dinheiro.go:52:20: valueobject.Dinheiro.String calls fmt.Sprintf, which eventually calls http.http2SettingID.String
+      #35: internal/infrastructure/seguranca/senha.go:18:24: seguranca.HashSenha calls rand.Read, which calls http.http2StreamError.Error
+      #36: internal/infrastructure/seguranca/senha.go:18:24: seguranca.HashSenha calls rand.Read, which calls http.http2StreamError.Error
+      #37: internal/infrastructure/postgres/conexao.go:90:22: postgres.Migrar calls sql.Tx.Commit, which eventually calls http.http2bufferedWriterTimeoutWriter.Write
+      #38: internal/infrastructure/postgres/conexao.go:90:22: postgres.Migrar calls sql.Tx.Commit, which eventually calls http.http2bufferedWriterTimeoutWriter.Write
+      #39: internal/infrastructure/postgres/conexao.go:90:22: postgres.Migrar calls sql.Tx.Commit, which eventually calls http.http2chunkWriter.Write
+      #40: internal/infrastructure/postgres/conexao.go:90:22: postgres.Migrar calls sql.Tx.Commit, which eventually calls http.http2chunkWriter.Write
+      #41: internal/domain/valueobject/dinheiro.go:52:20: valueobject.Dinheiro.String calls fmt.Sprintf, which eventually calls http.http2connError.Error
+      #42: internal/domain/valueobject/dinheiro.go:52:20: valueobject.Dinheiro.String calls fmt.Sprintf, which eventually calls http.http2connError.Error
+      #43: internal/infrastructure/seguranca/senha.go:18:24: seguranca.HashSenha calls rand.Read, which eventually calls http.http2duplicatePseudoHeaderError.Error
+      #44: internal/infrastructure/seguranca/senha.go:18:24: seguranca.HashSenha calls rand.Read, which eventually calls http.http2duplicatePseudoHeaderError.Error
+      #45: internal/infrastructure/seguranca/senha.go:18:24: seguranca.HashSenha calls rand.Read, which eventually calls http.http2headerFieldNameError.Error
+      #46: internal/infrastructure/seguranca/senha.go:18:24: seguranca.HashSenha calls rand.Read, which eventually calls http.http2headerFieldNameError.Error
+      #47: internal/infrastructure/seguranca/senha.go:18:24: seguranca.HashSenha calls rand.Read, which eventually calls http.http2headerFieldValueError.Error
+      #48: internal/infrastructure/seguranca/senha.go:18:24: seguranca.HashSenha calls rand.Read, which eventually calls http.http2headerFieldValueError.Error
+      #49: internal/infrastructure/seguranca/senha.go:18:24: seguranca.HashSenha calls rand.Read, which eventually calls http.http2pseudoHeaderError.Error
+      #50: internal/infrastructure/seguranca/senha.go:18:24: seguranca.HashSenha calls rand.Read, which eventually calls http.http2pseudoHeaderError.Error
+      #51: internal/infrastructure/seguranca/senha.go:18:24: seguranca.HashSenha calls rand.Read, which eventually calls http.http2requestBody.Read
+      #52: internal/infrastructure/seguranca/senha.go:18:24: seguranca.HashSenha calls rand.Read, which eventually calls http.http2requestBody.Read
+      #53: internal/domain/valueobject/dinheiro.go:52:20: valueobject.Dinheiro.String calls fmt.Sprintf, which eventually calls http.http2responseWriter.Write
+      #54: internal/domain/valueobject/dinheiro.go:52:20: valueobject.Dinheiro.String calls fmt.Sprintf, which eventually calls http.http2responseWriter.Write
+      #55: internal/infrastructure/seguranca/senha.go:18:24: seguranca.HashSenha calls rand.Read, which eventually calls http.http2responseWriter.WriteString
+      #56: internal/infrastructure/seguranca/senha.go:18:24: seguranca.HashSenha calls rand.Read, which eventually calls http.http2responseWriter.WriteString
+      #57: internal/domain/valueobject/dinheiro.go:52:20: valueobject.Dinheiro.String calls fmt.Sprintf, which eventually calls http.http2writeData.String
+      #58: internal/domain/valueobject/dinheiro.go:52:20: valueobject.Dinheiro.String calls fmt.Sprintf, which eventually calls http.http2writeData.String
+      #59: internal/infrastructure/seguranca/senha.go:18:24: seguranca.HashSenha calls rand.Read, which eventually calls http.loggingConn.Read
+      #60: internal/infrastructure/seguranca/senha.go:18:24: seguranca.HashSenha calls rand.Read, which eventually calls http.loggingConn.Read
+      #61: internal/infrastructure/postgres/conexao.go:90:22: postgres.Migrar calls sql.Tx.Commit, which eventually calls http.loggingConn.Write
+      #62: internal/infrastructure/postgres/conexao.go:90:22: postgres.Migrar calls sql.Tx.Commit, which eventually calls http.loggingConn.Write
+      #63: internal/infrastructure/seguranca/senha.go:18:24: seguranca.HashSenha calls rand.Read, which eventually calls http.maxBytesReader.Read
+      #64: internal/infrastructure/seguranca/senha.go:18:24: seguranca.HashSenha calls rand.Read, which eventually calls http.maxBytesReader.Read
+      #65: internal/infrastructure/postgres/conexao.go:78:26: postgres.Migrar calls sql.Conn.BeginTx, which eventually calls http.onceCloseListener.Close
+      #66: internal/infrastructure/postgres/conexao.go:78:26: postgres.Migrar calls sql.Conn.BeginTx, which eventually calls http.onceCloseListener.Close
+      #67: internal/domain/valueobject/dinheiro.go:52:20: valueobject.Dinheiro.String calls fmt.Sprintf, which eventually calls http.response.Write
+      #68: internal/domain/valueobject/dinheiro.go:52:20: valueobject.Dinheiro.String calls fmt.Sprintf, which eventually calls http.response.Write
+
+Vulnerability #5: GO-2026-6611
+    Excessive CPU consumption from repeated initial window changes in net/http
+  More info: https://pkg.go.dev/vuln/GO-2026-6611
+  Standard library
+    Found in: net/http@go1.26.5
+    Fixed in: net/http@go1.26.9
+    Example traces found:
+      #1: internal/domain/valueobject/dinheiro.go:52:20: valueobject.Dinheiro.String calls fmt.Sprintf, which eventually calls http.CanonicalHeaderKey
+      #2: internal/domain/valueobject/dinheiro.go:52:20: valueobject.Dinheiro.String calls fmt.Sprintf, which eventually calls http.CanonicalHeaderKey
+      #3: internal/interfaces/http/servidor.go:51:14: http.Servidor.Rotas calls http.ServeMux.HandleFunc
+      #4: internal/interfaces/http/servidor.go:51:14: http.Servidor.Rotas calls http.ServeMux.HandleFunc
+      #5: cmd/api/main.go:88:28: api.main calls http.Server.ListenAndServe
+      #6: cmd/api/main.go:88:28: api.main calls http.Server.ListenAndServe
+      #7: internal/infrastructure/seguranca/senha.go:18:24: seguranca.HashSenha calls rand.Read, which eventually calls http.body.Read
+      #8: internal/infrastructure/seguranca/senha.go:18:24: seguranca.HashSenha calls rand.Read, which eventually calls http.body.Read
+      #9: internal/infrastructure/seguranca/senha.go:18:24: seguranca.HashSenha calls rand.Read, which eventually calls http.bodyEOFSignal.Read
+      #10: internal/infrastructure/seguranca/senha.go:18:24: seguranca.HashSenha calls rand.Read, which eventually calls http.bodyEOFSignal.Read
+      #11: internal/infrastructure/seguranca/senha.go:18:24: seguranca.HashSenha calls rand.Read, which eventually calls http.bodyLocked.Read
+      #12: internal/infrastructure/seguranca/senha.go:18:24: seguranca.HashSenha calls rand.Read, which eventually calls http.bodyLocked.Read
+      #13: internal/infrastructure/postgres/conexao.go:90:22: postgres.Migrar calls sql.Tx.Commit, which eventually calls http.checkConnErrorWriter.Write
+      #14: internal/infrastructure/postgres/conexao.go:90:22: postgres.Migrar calls sql.Tx.Commit, which eventually calls http.checkConnErrorWriter.Write
+      #15: internal/infrastructure/postgres/conexao.go:90:22: postgres.Migrar calls sql.Tx.Commit, which eventually calls http.chunkWriter.Write
+      #16: internal/infrastructure/postgres/conexao.go:90:22: postgres.Migrar calls sql.Tx.Commit, which eventually calls http.chunkWriter.Write
+      #17: internal/infrastructure/seguranca/senha.go:18:24: seguranca.HashSenha calls rand.Read, which eventually calls http.connReader.Read
+      #18: internal/infrastructure/seguranca/senha.go:18:24: seguranca.HashSenha calls rand.Read, which eventually calls http.connReader.Read
+      #19: internal/infrastructure/seguranca/senha.go:18:24: seguranca.HashSenha calls rand.Read, which eventually calls http.expectContinueReader.Read
+      #20: internal/infrastructure/seguranca/senha.go:18:24: seguranca.HashSenha calls rand.Read, which eventually calls http.expectContinueReader.Read
+      #21: internal/domain/valueobject/dinheiro.go:52:20: valueobject.Dinheiro.String calls fmt.Sprintf, which eventually calls http.http2ConnectionError.Error
+      #22: internal/domain/valueobject/dinheiro.go:52:20: valueobject.Dinheiro.String calls fmt.Sprintf, which eventually calls http.http2ConnectionError.Error
+      #23: internal/domain/valueobject/dinheiro.go:52:20: valueobject.Dinheiro.String calls fmt.Sprintf, which eventually calls http.http2ErrCode.String
+      #24: internal/domain/valueobject/dinheiro.go:52:20: valueobject.Dinheiro.String calls fmt.Sprintf, which eventually calls http.http2ErrCode.String
+      #25: internal/domain/valueobject/dinheiro.go:52:20: valueobject.Dinheiro.String calls fmt.Sprintf, which eventually calls http.http2FrameHeader.String
+      #26: internal/domain/valueobject/dinheiro.go:52:20: valueobject.Dinheiro.String calls fmt.Sprintf, which eventually calls http.http2FrameHeader.String
+      #27: internal/domain/valueobject/dinheiro.go:52:20: valueobject.Dinheiro.String calls fmt.Sprintf, which eventually calls http.http2FrameType.String
+      #28: internal/domain/valueobject/dinheiro.go:52:20: valueobject.Dinheiro.String calls fmt.Sprintf, which eventually calls http.http2FrameType.String
+      #29: internal/domain/valueobject/dinheiro.go:52:20: valueobject.Dinheiro.String calls fmt.Sprintf, which eventually calls http.http2FrameWriteRequest.String
+      #30: internal/domain/valueobject/dinheiro.go:52:20: valueobject.Dinheiro.String calls fmt.Sprintf, which eventually calls http.http2FrameWriteRequest.String
+      #31: internal/domain/valueobject/dinheiro.go:52:20: valueobject.Dinheiro.String calls fmt.Sprintf, which eventually calls http.http2Setting.String
+      #32: internal/domain/valueobject/dinheiro.go:52:20: valueobject.Dinheiro.String calls fmt.Sprintf, which eventually calls http.http2Setting.String
+      #33: internal/domain/valueobject/dinheiro.go:52:20: valueobject.Dinheiro.String calls fmt.Sprintf, which eventually calls http.http2SettingID.String
+      #34: internal/domain/valueobject/dinheiro.go:52:20: valueobject.Dinheiro.String calls fmt.Sprintf, which eventually calls http.http2SettingID.String
+      #35: internal/infrastructure/seguranca/senha.go:18:24: seguranca.HashSenha calls rand.Read, which calls http.http2StreamError.Error
+      #36: internal/infrastructure/seguranca/senha.go:18:24: seguranca.HashSenha calls rand.Read, which calls http.http2StreamError.Error
+      #37: internal/infrastructure/postgres/conexao.go:90:22: postgres.Migrar calls sql.Tx.Commit, which eventually calls http.http2bufferedWriterTimeoutWriter.Write
+      #38: internal/infrastructure/postgres/conexao.go:90:22: postgres.Migrar calls sql.Tx.Commit, which eventually calls http.http2bufferedWriterTimeoutWriter.Write
+      #39: internal/infrastructure/postgres/conexao.go:90:22: postgres.Migrar calls sql.Tx.Commit, which eventually calls http.http2chunkWriter.Write
+      #40: internal/infrastructure/postgres/conexao.go:90:22: postgres.Migrar calls sql.Tx.Commit, which eventually calls http.http2chunkWriter.Write
+      #41: internal/domain/valueobject/dinheiro.go:52:20: valueobject.Dinheiro.String calls fmt.Sprintf, which eventually calls http.http2connError.Error
+      #42: internal/domain/valueobject/dinheiro.go:52:20: valueobject.Dinheiro.String calls fmt.Sprintf, which eventually calls http.http2connError.Error
+      #43: internal/infrastructure/seguranca/senha.go:18:24: seguranca.HashSenha calls rand.Read, which eventually calls http.http2duplicatePseudoHeaderError.Error
+      #44: internal/infrastructure/seguranca/senha.go:18:24: seguranca.HashSenha calls rand.Read, which eventually calls http.http2duplicatePseudoHeaderError.Error
+      #45: internal/infrastructure/seguranca/senha.go:18:24: seguranca.HashSenha calls rand.Read, which eventually calls http.http2headerFieldNameError.Error
+      #46: internal/infrastructure/seguranca/senha.go:18:24: seguranca.HashSenha calls rand.Read, which eventually calls http.http2headerFieldNameError.Error
+      #47: internal/infrastructure/seguranca/senha.go:18:24: seguranca.HashSenha calls rand.Read, which eventually calls http.http2headerFieldValueError.Error
+      #48: internal/infrastructure/seguranca/senha.go:18:24: seguranca.HashSenha calls rand.Read, which eventually calls http.http2headerFieldValueError.Error
+      #49: internal/infrastructure/seguranca/senha.go:18:24: seguranca.HashSenha calls rand.Read, which eventually calls http.http2pseudoHeaderError.Error
+      #50: internal/infrastructure/seguranca/senha.go:18:24: seguranca.HashSenha calls rand.Read, which eventually calls http.http2pseudoHeaderError.Error
+      #51: internal/infrastructure/seguranca/senha.go:18:24: seguranca.HashSenha calls rand.Read, which eventually calls http.http2requestBody.Read
+      #52: internal/infrastructure/seguranca/senha.go:18:24: seguranca.HashSenha calls rand.Read, which eventually calls http.http2requestBody.Read
+      #53: internal/domain/valueobject/dinheiro.go:52:20: valueobject.Dinheiro.String calls fmt.Sprintf, which eventually calls http.http2responseWriter.Write
+      #54: internal/domain/valueobject/dinheiro.go:52:20: valueobject.Dinheiro.String calls fmt.Sprintf, which eventually calls http.http2responseWriter.Write
+      #55: internal/infrastructure/seguranca/senha.go:18:24: seguranca.HashSenha calls rand.Read, which eventually calls http.http2responseWriter.WriteString
+      #56: internal/infrastructure/seguranca/senha.go:18:24: seguranca.HashSenha calls rand.Read, which eventually calls http.http2responseWriter.WriteString
+      #57: internal/domain/valueobject/dinheiro.go:52:20: valueobject.Dinheiro.String calls fmt.Sprintf, which eventually calls http.http2writeData.String
+      #58: internal/domain/valueobject/dinheiro.go:52:20: valueobject.Dinheiro.String calls fmt.Sprintf, which eventually calls http.http2writeData.String
+      #59: internal/infrastructure/seguranca/senha.go:18:24: seguranca.HashSenha calls rand.Read, which eventually calls http.loggingConn.Read
+      #60: internal/infrastructure/seguranca/senha.go:18:24: seguranca.HashSenha calls rand.Read, which eventually calls http.loggingConn.Read
+      #61: internal/infrastructure/postgres/conexao.go:90:22: postgres.Migrar calls sql.Tx.Commit, which eventually calls http.loggingConn.Write
+      #62: internal/infrastructure/postgres/conexao.go:90:22: postgres.Migrar calls sql.Tx.Commit, which eventually calls http.loggingConn.Write
+      #63: internal/infrastructure/seguranca/senha.go:18:24: seguranca.HashSenha calls rand.Read, which eventually calls http.maxBytesReader.Read
+      #64: internal/infrastructure/seguranca/senha.go:18:24: seguranca.HashSenha calls rand.Read, which eventually calls http.maxBytesReader.Read
+      #65: internal/infrastructure/postgres/conexao.go:78:26: postgres.Migrar calls sql.Conn.BeginTx, which eventually calls http.onceCloseListener.Close
+      #66: internal/infrastructure/postgres/conexao.go:78:26: postgres.Migrar calls sql.Conn.BeginTx, which eventually calls http.onceCloseListener.Close
+      #67: internal/domain/valueobject/dinheiro.go:52:20: valueobject.Dinheiro.String calls fmt.Sprintf, which eventually calls http.response.Write
+      #68: internal/domain/valueobject/dinheiro.go:52:20: valueobject.Dinheiro.String calls fmt.Sprintf, which eventually calls http.response.Write
+
+Vulnerability #6: GO-2026-6608
+    Memory limit bypass when parsing MIME headers in net/textproto,
+    mime/multipart
+  More info: https://pkg.go.dev/vuln/GO-2026-6608
+  Standard library
+    Found in: mime/multipart@go1.26.5
+    Fixed in: mime/multipart@go1.26.9
+    Example traces found:
+      #1: cmd/api/main.go:88:28: api.main calls http.Server.ListenAndServe, which eventually calls textproto.Reader.ReadMIMEHeader
+
+Vulnerability #7: GO-2026-6607
+    Reject malformed ECH outer extension references in crypto/tls
+  More info: https://pkg.go.dev/vuln/GO-2026-6607
+  Standard library
+    Found in: crypto/tls@go1.26.5
+    Fixed in: crypto/tls@go1.26.9
+    Example traces found:
+      #1: cmd/api/main.go:88:28: api.main calls http.Server.ListenAndServe, which eventually calls tls.Conn.HandshakeContext
+      #2: internal/infrastructure/seguranca/senha.go:18:24: seguranca.HashSenha calls rand.Read, which eventually calls tls.Conn.Read
+      #3: cmd/api/main.go:88:28: api.main calls http.Server.ListenAndServe, which eventually calls tls.Conn.Write
+
+Vulnerability #8: GO-2026-6603
+    HTTP/2 server memory exhaustion due to Trailer headers in net/http
+  More info: https://pkg.go.dev/vuln/GO-2026-6603
+  Standard library
+    Found in: net/http@go1.26.5
+    Fixed in: net/http@go1.26.9
+    Example traces found:
+      #1: internal/domain/valueobject/dinheiro.go:52:20: valueobject.Dinheiro.String calls fmt.Sprintf, which eventually calls http.CanonicalHeaderKey
+      #2: internal/domain/valueobject/dinheiro.go:52:20: valueobject.Dinheiro.String calls fmt.Sprintf, which eventually calls http.CanonicalHeaderKey
+      #3: internal/interfaces/http/servidor.go:51:14: http.Servidor.Rotas calls http.ServeMux.HandleFunc
+      #4: internal/interfaces/http/servidor.go:51:14: http.Servidor.Rotas calls http.ServeMux.HandleFunc
+      #5: cmd/api/main.go:88:28: api.main calls http.Server.ListenAndServe
+      #6: cmd/api/main.go:88:28: api.main calls http.Server.ListenAndServe
+      #7: internal/infrastructure/seguranca/senha.go:18:24: seguranca.HashSenha calls rand.Read, which eventually calls http.body.Read
+      #8: internal/infrastructure/seguranca/senha.go:18:24: seguranca.HashSenha calls rand.Read, which eventually calls http.body.Read
+      #9: internal/infrastructure/seguranca/senha.go:18:24: seguranca.HashSenha calls rand.Read, which eventually calls http.bodyEOFSignal.Read
+      #10: internal/infrastructure/seguranca/senha.go:18:24: seguranca.HashSenha calls rand.Read, which eventually calls http.bodyEOFSignal.Read
+      #11: internal/infrastructure/seguranca/senha.go:18:24: seguranca.HashSenha calls rand.Read, which eventually calls http.bodyLocked.Read
+      #12: internal/infrastructure/seguranca/senha.go:18:24: seguranca.HashSenha calls rand.Read, which eventually calls http.bodyLocked.Read
+      #13: internal/infrastructure/postgres/conexao.go:90:22: postgres.Migrar calls sql.Tx.Commit, which eventually calls http.checkConnErrorWriter.Write
+      #14: internal/infrastructure/postgres/conexao.go:90:22: postgres.Migrar calls sql.Tx.Commit, which eventually calls http.checkConnErrorWriter.Write
+      #15: internal/infrastructure/postgres/conexao.go:90:22: postgres.Migrar calls sql.Tx.Commit, which eventually calls http.chunkWriter.Write
+      #16: internal/infrastructure/postgres/conexao.go:90:22: postgres.Migrar calls sql.Tx.Commit, which eventually calls http.chunkWriter.Write
+      #17: internal/infrastructure/seguranca/senha.go:18:24: seguranca.HashSenha calls rand.Read, which eventually calls http.connReader.Read
+      #18: internal/infrastructure/seguranca/senha.go:18:24: seguranca.HashSenha calls rand.Read, which eventually calls http.connReader.Read
+      #19: internal/infrastructure/seguranca/senha.go:18:24: seguranca.HashSenha calls rand.Read, which eventually calls http.expectContinueReader.Read
+      #20: internal/infrastructure/seguranca/senha.go:18:24: seguranca.HashSenha calls rand.Read, which eventually calls http.expectContinueReader.Read
+      #21: internal/domain/valueobject/dinheiro.go:52:20: valueobject.Dinheiro.String calls fmt.Sprintf, which eventually calls http.http2ConnectionError.Error
+      #22: internal/domain/valueobject/dinheiro.go:52:20: valueobject.Dinheiro.String calls fmt.Sprintf, which eventually calls http.http2ConnectionError.Error
+      #23: internal/domain/valueobject/dinheiro.go:52:20: valueobject.Dinheiro.String calls fmt.Sprintf, which eventually calls http.http2ErrCode.String
+      #24: internal/domain/valueobject/dinheiro.go:52:20: valueobject.Dinheiro.String calls fmt.Sprintf, which eventually calls http.http2ErrCode.String
+      #25: internal/domain/valueobject/dinheiro.go:52:20: valueobject.Dinheiro.String calls fmt.Sprintf, which eventually calls http.http2FrameHeader.String
+      #26: internal/domain/valueobject/dinheiro.go:52:20: valueobject.Dinheiro.String calls fmt.Sprintf, which eventually calls http.http2FrameHeader.String
+      #27: internal/domain/valueobject/dinheiro.go:52:20: valueobject.Dinheiro.String calls fmt.Sprintf, which eventually calls http.http2FrameType.String
+      #28: internal/domain/valueobject/dinheiro.go:52:20: valueobject.Dinheiro.String calls fmt.Sprintf, which eventually calls http.http2FrameType.String
+      #29: internal/domain/valueobject/dinheiro.go:52:20: valueobject.Dinheiro.String calls fmt.Sprintf, which eventually calls http.http2FrameWriteRequest.String
+      #30: internal/domain/valueobject/dinheiro.go:52:20: valueobject.Dinheiro.String calls fmt.Sprintf, which eventually calls http.http2FrameWriteRequest.String
+      #31: internal/domain/valueobject/dinheiro.go:52:20: valueobject.Dinheiro.String calls fmt.Sprintf, which eventually calls http.http2Setting.String
+      #32: internal/domain/valueobject/dinheiro.go:52:20: valueobject.Dinheiro.String calls fmt.Sprintf, which eventually calls http.http2Setting.String
+      #33: internal/domain/valueobject/dinheiro.go:52:20: valueobject.Dinheiro.String calls fmt.Sprintf, which eventually calls http.http2SettingID.String
+      #34: internal/domain/valueobject/dinheiro.go:52:20: valueobject.Dinheiro.String calls fmt.Sprintf, which eventually calls http.http2SettingID.String
+      #35: internal/infrastructure/seguranca/senha.go:18:24: seguranca.HashSenha calls rand.Read, which calls http.http2StreamError.Error
+      #36: internal/infrastructure/seguranca/senha.go:18:24: seguranca.HashSenha calls rand.Read, which calls http.http2StreamError.Error
+      #37: internal/infrastructure/postgres/conexao.go:90:22: postgres.Migrar calls sql.Tx.Commit, which eventually calls http.http2bufferedWriterTimeoutWriter.Write
+      #38: internal/infrastructure/postgres/conexao.go:90:22: postgres.Migrar calls sql.Tx.Commit, which eventually calls http.http2bufferedWriterTimeoutWriter.Write
+      #39: internal/infrastructure/postgres/conexao.go:90:22: postgres.Migrar calls sql.Tx.Commit, which eventually calls http.http2chunkWriter.Write
+      #40: internal/infrastructure/postgres/conexao.go:90:22: postgres.Migrar calls sql.Tx.Commit, which eventually calls http.http2chunkWriter.Write
+      #41: internal/domain/valueobject/dinheiro.go:52:20: valueobject.Dinheiro.String calls fmt.Sprintf, which eventually calls http.http2connError.Error
+      #42: internal/domain/valueobject/dinheiro.go:52:20: valueobject.Dinheiro.String calls fmt.Sprintf, which eventually calls http.http2connError.Error
+      #43: internal/infrastructure/seguranca/senha.go:18:24: seguranca.HashSenha calls rand.Read, which eventually calls http.http2duplicatePseudoHeaderError.Error
+      #44: internal/infrastructure/seguranca/senha.go:18:24: seguranca.HashSenha calls rand.Read, which eventually calls http.http2duplicatePseudoHeaderError.Error
+      #45: internal/infrastructure/seguranca/senha.go:18:24: seguranca.HashSenha calls rand.Read, which eventually calls http.http2headerFieldNameError.Error
+      #46: internal/infrastructure/seguranca/senha.go:18:24: seguranca.HashSenha calls rand.Read, which eventually calls http.http2headerFieldNameError.Error
+      #47: internal/infrastructure/seguranca/senha.go:18:24: seguranca.HashSenha calls rand.Read, which eventually calls http.http2headerFieldValueError.Error
+      #48: internal/infrastructure/seguranca/senha.go:18:24: seguranca.HashSenha calls rand.Read, which eventually calls http.http2headerFieldValueError.Error
+      #49: internal/infrastructure/seguranca/senha.go:18:24: seguranca.HashSenha calls rand.Read, which eventually calls http.http2pseudoHeaderError.Error
+      #50: internal/infrastructure/seguranca/senha.go:18:24: seguranca.HashSenha calls rand.Read, which eventually calls http.http2pseudoHeaderError.Error
+      #51: internal/infrastructure/seguranca/senha.go:18:24: seguranca.HashSenha calls rand.Read, which eventually calls http.http2requestBody.Read
+      #52: internal/infrastructure/seguranca/senha.go:18:24: seguranca.HashSenha calls rand.Read, which eventually calls http.http2requestBody.Read
+      #53: internal/domain/valueobject/dinheiro.go:52:20: valueobject.Dinheiro.String calls fmt.Sprintf, which eventually calls http.http2responseWriter.Write
+      #54: internal/domain/valueobject/dinheiro.go:52:20: valueobject.Dinheiro.String calls fmt.Sprintf, which eventually calls http.http2responseWriter.Write
+      #55: internal/infrastructure/seguranca/senha.go:18:24: seguranca.HashSenha calls rand.Read, which eventually calls http.http2responseWriter.WriteString
+      #56: internal/infrastructure/seguranca/senha.go:18:24: seguranca.HashSenha calls rand.Read, which eventually calls http.http2responseWriter.WriteString
+      #57: internal/domain/valueobject/dinheiro.go:52:20: valueobject.Dinheiro.String calls fmt.Sprintf, which eventually calls http.http2writeData.String
+      #58: internal/domain/valueobject/dinheiro.go:52:20: valueobject.Dinheiro.String calls fmt.Sprintf, which eventually calls http.http2writeData.String
+      #59: internal/infrastructure/seguranca/senha.go:18:24: seguranca.HashSenha calls rand.Read, which eventually calls http.loggingConn.Read
+      #60: internal/infrastructure/seguranca/senha.go:18:24: seguranca.HashSenha calls rand.Read, which eventually calls http.loggingConn.Read
+      #61: internal/infrastructure/postgres/conexao.go:90:22: postgres.Migrar calls sql.Tx.Commit, which eventually calls http.loggingConn.Write
+      #62: internal/infrastructure/postgres/conexao.go:90:22: postgres.Migrar calls sql.Tx.Commit, which eventually calls http.loggingConn.Write
+      #63: internal/infrastructure/seguranca/senha.go:18:24: seguranca.HashSenha calls rand.Read, which eventually calls http.maxBytesReader.Read
+      #64: internal/infrastructure/seguranca/senha.go:18:24: seguranca.HashSenha calls rand.Read, which eventually calls http.maxBytesReader.Read
+      #65: internal/infrastructure/postgres/conexao.go:78:26: postgres.Migrar calls sql.Conn.BeginTx, which eventually calls http.onceCloseListener.Close
+      #66: internal/infrastructure/postgres/conexao.go:78:26: postgres.Migrar calls sql.Conn.BeginTx, which eventually calls http.onceCloseListener.Close
+      #67: internal/domain/valueobject/dinheiro.go:52:20: valueobject.Dinheiro.String calls fmt.Sprintf, which eventually calls http.response.Write
+      #68: internal/domain/valueobject/dinheiro.go:52:20: valueobject.Dinheiro.String calls fmt.Sprintf, which eventually calls http.response.Write
+
+Vulnerability #9: GO-2026-6090
+    Limit handshake messages we are willing to accept post-handshake in
+    crypto/tls
+  More info: https://pkg.go.dev/vuln/GO-2026-6090
+  Standard library
+    Found in: crypto/tls@go1.26.5
+    Fixed in: crypto/tls@go1.26.6
+    Example traces found:
+      #1: cmd/api/main.go:88:28: api.main calls http.Server.ListenAndServe, which eventually calls tls.Conn.HandshakeContext
+      #2: internal/infrastructure/seguranca/senha.go:18:24: seguranca.HashSenha calls rand.Read, which eventually calls tls.Conn.Read
+      #3: cmd/api/main.go:88:28: api.main calls http.Server.ListenAndServe, which eventually calls tls.Conn.Write
+
+Vulnerability #10: GO-2026-6089
+    Apply ReadHeaderTimeout when doing unencrypted HTTP/2 check in net/http
+  More info: https://pkg.go.dev/vuln/GO-2026-6089
+  Standard library
+    Found in: net/http@go1.26.5
+    Fixed in: net/http@go1.26.6
+    Example traces found:
+      #1: cmd/api/main.go:88:28: api.main calls http.Server.ListenAndServe
+
+Vulnerability #11: GO-2026-6088
+    Add recursion depth guard during decode in encoding/xml
+  More info: https://pkg.go.dev/vuln/GO-2026-6088
+  Standard library
+    Found in: encoding/xml@go1.26.5
+    Fixed in: encoding/xml@go1.26.6
+    Example traces found:
+      #1: internal/infrastructure/postgres/cadastro.go:186:17: postgres.Servicos.Listar calls sql.Rows.Next, which eventually calls xml.Unmarshal
+
+Vulnerability #12: GO-2026-5972
+    Enforce maximum recursion depth in encoding/asn1
+  More info: https://pkg.go.dev/vuln/GO-2026-5972
+  Standard library
+    Found in: encoding/asn1@go1.26.5
+    Fixed in: encoding/asn1@go1.26.6
+    Example traces found:
+      #1: internal/infrastructure/postgres/conexao.go:78:26: postgres.Migrar calls sql.Conn.BeginTx, which eventually calls asn1.Unmarshal
+
+Your code is affected by 12 vulnerabilities from the Go standard library.
+This scan also found 7 vulnerabilities in packages you import and 3
+vulnerabilities in modules you require, but your code doesn't appear to call
+these vulnerabilities.
+Use '-show verbose' for more details.
